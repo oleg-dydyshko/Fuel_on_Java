@@ -1,14 +1,14 @@
 package serhij.korneluk.chemlabfuel;
 
 import android.app.Dialog;
-import android.content.Context;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -17,11 +17,29 @@ import androidx.fragment.app.DialogFragment;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
 public class Dialod_opisanie_edit extends DialogFragment {
 
-    static Dialod_opisanie_edit getInstance(String uid, String data2, String data3, String data4, String data5, String data6, String data7, String data8, String data9, String data10) {
+    private String data8 = "";
+    private long data11;
+    private String uid = "";
+    private boolean add = true;
+    private long size = -1;
+    private TextView editText7;
+    private TextView editText9;
+    private TextView editText10;
+    private String user = "";
+    private String data9_Konservacia = "";
+    private String data10_RazKonservacia = "";
+    private String data7_OldCheck = "";
+    private String data6_PeriodCheck = "";
+
+    static Dialod_opisanie_edit getInstance(String user, String uid, String data2, String data3, String data4, String data5, String data6, String data7, String data8, String data9, String data10, String data12) {
         Dialod_opisanie_edit opisanie = new Dialod_opisanie_edit();
         Bundle bundle = new Bundle();
+        bundle.putString("user", user);
         bundle.putString("uid", uid);
         bundle.putString("data2", data2);
         bundle.putString("data3", data3);
@@ -32,8 +50,45 @@ public class Dialod_opisanie_edit extends DialogFragment {
         bundle.putString("data8", data8);
         bundle.putString("data9", data9);
         bundle.putString("data10", data10);
+        bundle.putString("data12", data12);
         opisanie.setArguments(bundle);
         return opisanie;
+    }
+
+    static Dialod_opisanie_edit getInstance(String user, long size) {
+        Dialod_opisanie_edit opisanie = new Dialod_opisanie_edit();
+        Bundle bundle = new Bundle();
+        bundle.putString("user", user);
+        bundle.putLong("size", size);
+        opisanie.setArguments(bundle);
+        return opisanie;
+    }
+
+    void set_data(int textview, int year, int month, int dayOfMonth) {
+        String zero = "";
+        String zero2 = "";
+        if (month < 9) zero = "0";
+        if (dayOfMonth < 10) zero2 = "0";
+        switch (textview) {
+            case 7:
+                if (year == 0)
+                    editText7.setText("");
+                else
+                    editText7.setText(year + "-" + zero + (month + 1) + "-" + zero2 + dayOfMonth);
+                break;
+            case 9:
+                if (year == 0)
+                    editText9.setText("");
+                else
+                    editText9.setText(year + "-" + zero + (month + 1) + "-" + zero2 + dayOfMonth);
+                break;
+            case 10:
+                if (year == 0)
+                    editText10.setText("");
+                else
+                    editText10.setText(year + "-" + zero + (month + 1) + "-" + zero2 + dayOfMonth);
+                break;
+        }
     }
 
     @NonNull
@@ -42,53 +97,206 @@ public class Dialod_opisanie_edit extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         View view = getActivity().getLayoutInflater().inflate(R.layout.dialog_opisanie_edit, null);
         TextView editTextTitle = view.findViewById(R.id.textViewTitle);
-        EditText editText1 = view.findViewById(R.id.textView1e);
+
         EditText editText2 = view.findViewById(R.id.textView2e);
         EditText editText3 = view.findViewById(R.id.textView3e);
         EditText editText4 = view.findViewById(R.id.textView4e);
         EditText editText5 = view.findViewById(R.id.textView5e);
         EditText editText6 = view.findViewById(R.id.textView6e);
-        EditText editText7 = view.findViewById(R.id.textView7e);
-        EditText editText8 = view.findViewById(R.id.textView8e);
-        EditText editText9 = view.findViewById(R.id.textView9e);
-        String uid = getArguments().getString("uid", "");
-        editTextTitle.setText(getArguments().getString("data2"));
-        editText1.setText(getArguments().getString("data2"));
-        editText2.setText(getArguments().getString("data3"));
-        editText3.setText(getArguments().getString("data4"));
-        editText4.setText(getArguments().getString("data5"));
-        editText5.setText(getArguments().getString("data6"));
-        editText6.setText(getArguments().getString("data7"));
-        editText7.setText(getArguments().getString("data8"));
-        editText8.setText(getArguments().getString("data9"));
-        editText9.setText(getArguments().getString("data10"));
-        editText1.setSelection(editText1.getText().length());
+        editText7 = view.findViewById(R.id.textView7e);
+        editText9 = view.findViewById(R.id.textView9e);
+        editText10 = view.findViewById(R.id.textView10e);
+        EditText editText12 = view.findViewById(R.id.textView12e);
+        editText7.setOnClickListener((v -> {
+            GregorianCalendar c;
+            if (editText7.getText().toString().equals("")) {
+                c = (GregorianCalendar) Calendar.getInstance();
+            } else {
+                String[] t1 = editText7.getText().toString().split("-");
+                c = new GregorianCalendar(Integer.parseInt(t1[0]), Integer.parseInt(t1[1]) - 1, Integer.parseInt(t1[2]));
+            }
+            TextView textView7 = view.findViewById(R.id.textView7);
+            Dialog_data data = Dialog_data.getInstance(c.getTimeInMillis(), 7, textView7.getText().toString());
+            data.show(getFragmentManager(), "data");
+        }));
+        editText9.setOnClickListener((v -> {
+            GregorianCalendar c;
+            if (editText9.getText().toString().equals("")) {
+                c = (GregorianCalendar) Calendar.getInstance();
+            } else {
+                String[] t1 = editText9.getText().toString().split("-");
+                c = new GregorianCalendar(Integer.parseInt(t1[0]), Integer.parseInt(t1[1]) - 1, Integer.parseInt(t1[2]));
+            }
+            TextView textView9 = view.findViewById(R.id.textView9);
+            Dialog_data data = Dialog_data.getInstance(c.getTimeInMillis(), 9, textView9.getText().toString());
+            data.show(getFragmentManager(), "data");
+        }));
+        editText10.setOnClickListener((v -> {
+            GregorianCalendar c;
+            if (editText10.getText().toString().equals("")) {
+                c = (GregorianCalendar) Calendar.getInstance();
+            } else {
+                String[] t1 = editText10.getText().toString().split("-");
+                c = new GregorianCalendar(Integer.parseInt(t1[0]), Integer.parseInt(t1[1]) - 1, Integer.parseInt(t1[2]));
+            }
+            TextView textView10 = view.findViewById(R.id.textView10);
+            Dialog_data data = Dialog_data.getInstance(c.getTimeInMillis(), 10, textView10.getText().toString());
+            data.show(getFragmentManager(), "data");
+        }));
+
+        String data2 = "";
+        String data3 = "";
+        String data4 = "";
+        String data5 = "";
+        String data12 = "";
+        if (getArguments() != null) {
+            user = getArguments().getString("user", "");
+            size = getArguments().getLong("size", -1);
+            uid = getArguments().getString("uid", "");
+            data9_Konservacia = getArguments().getString("data9", "");
+            data10_RazKonservacia = getArguments().getString("data10", "");
+            data7_OldCheck = getArguments().getString("data7", "");
+            data6_PeriodCheck = getArguments().getString("data6", "");
+            data2 = getArguments().getString("data2", "");
+            data3 = getArguments().getString("data3", "");
+            data4 = getArguments().getString("data4", "");
+            data5 = getArguments().getString("data5", "");
+            data12 = getArguments().getString("data12", "");
+        }
+        if (size == -1)
+            add = false;
+
+        if (add)
+            editTextTitle.setText("Добавить запись");
+        else
+            editTextTitle.setText(data2);
+        editText2.setText(data2);
+        editText3.setText(data3);
+        editText4.setText(data4);
+        editText5.setText(data5);
+        editText6.setText(data6_PeriodCheck);
+        editText7.setText(data7_OldCheck);
+        editText9.setText(data9_Konservacia);
+        editText10.setText(data10_RazKonservacia);
+        editText12.setText(data12);
+
         editText2.setSelection(editText2.getText().length());
         editText3.setSelection(editText3.getText().length());
         editText4.setSelection(editText4.getText().length());
         editText5.setSelection(editText5.getText().length());
         editText6.setSelection(editText6.getText().length());
-        editText7.setSelection(editText7.getText().length());
-        editText8.setSelection(editText8.getText().length());
-        editText9.setSelection(editText9.getText().length());
+        editText12.setSelection(editText12.getText().length());
 
         // Показываем клавиатуру
-        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+        //InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        //imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
         builder.setView(view);
 
         builder.setPositiveButton("Сохранить", (dialog, which) -> {
-            DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-            mDatabase.child("equipments").child(uid).child("data02").setValue(editText1.getText().toString());
-            mDatabase.child("equipments").child(uid).child("data03").setValue(editText2.getText().toString());
-            mDatabase.child("equipments").child(uid).child("data04").setValue(editText3.getText().toString());
-            mDatabase.child("equipments").child(uid).child("data05").setValue(editText4.getText().toString());
-            mDatabase.child("equipments").child(uid).child("data06").setValue(editText5.getText().toString());
-            mDatabase.child("equipments").child(uid).child("data07").setValue(editText6.getText().toString());
-            mDatabase.child("equipments").child(uid).child("data08").setValue(editText7.getText().toString());
-            mDatabase.child("equipments").child(uid).child("data09").setValue(editText8.getText().toString());
-            mDatabase.child("equipments").child(uid).child("data10").setValue(editText9.getText().toString());
-            dialog.cancel();
+            data9_Konservacia = editText9.getText().toString().trim();
+            data10_RazKonservacia = editText10.getText().toString().trim();
+            data7_OldCheck = editText7.getText().toString().trim();
+            data6_PeriodCheck = editText6.getText().toString().trim();
+            if (!data7_OldCheck.equals("") && data7_OldCheck.contains("-")) {
+                GregorianCalendar c = (GregorianCalendar) Calendar.getInstance();
+                c.add(Calendar.YEAR, 20);
+                data11 = c.getTimeInMillis();
+                if (data6_PeriodCheck != null && !data6_PeriodCheck.equals("")) {
+                    if (data9_Konservacia != null && !data9_Konservacia.equals("")) {
+                        if (data10_RazKonservacia != null && !data10_RazKonservacia.equals("")) {
+                            String[] tk = data9_Konservacia.split("-");
+                            String[] tr = data10_RazKonservacia.split("-");
+                            c.set(Integer.parseInt(tk[0]), (Integer.parseInt(tk[1]) - 1), Integer.parseInt(tk[2]));
+                            long start = c.getTimeInMillis();
+                            c.set(Integer.parseInt(tr[0]), (Integer.parseInt(tr[1]) - 1), Integer.parseInt(tr[2]));
+                            long end = c.getTimeInMillis();
+                            if (start > end) {
+                                GregorianCalendar g = (GregorianCalendar) Calendar.getInstance();
+                                g.add(Calendar.YEAR, 20);
+                                data11 = g.getTimeInMillis();
+                                String zero = "";
+                                if (c.get(Calendar.DATE) < 10) zero = "0";
+                                String zero2 = "";
+                                if (c.get(Calendar.MONTH) < 9) zero2 = "0";
+                                String[] t1 = data7_OldCheck.split("-");
+                                c.set(Integer.parseInt(t1[0]), (Integer.parseInt(t1[1]) - 1), Integer.parseInt(t1[2]));
+                                c.add(Calendar.MONTH, Integer.parseInt(data6_PeriodCheck));
+                                data8 = c.get(Calendar.YEAR) + "-" + zero2 + (c.get(Calendar.MONTH) + 1) + "-" + zero + c.get(Calendar.DATE);
+                            } else {
+                                String[] t1 = data7_OldCheck.split("-");
+                                c.set(Integer.parseInt(t1[0]), (Integer.parseInt(t1[1]) - 1), Integer.parseInt(t1[2]));
+                                c.add(Calendar.MONTH, Integer.parseInt(data6_PeriodCheck));
+                                String zero = "";
+                                if (c.get(Calendar.DATE) < 10) zero = "0";
+                                String zero2 = "";
+                                if (c.get(Calendar.MONTH) < 9) zero2 = "0";
+                                data8 = c.get(Calendar.YEAR) + "-" + zero2 + (c.get(Calendar.MONTH) + 1) + "-" + zero + c.get(Calendar.DATE);
+                                data11 = c.getTimeInMillis();
+                            }
+                        } else {
+                            GregorianCalendar g = (GregorianCalendar) Calendar.getInstance();
+                            g.add(Calendar.YEAR, 20);
+                            data11 = g.getTimeInMillis();
+                            String[] t1 = data7_OldCheck.split("-");
+                            c.set(Integer.parseInt(t1[0]), (Integer.parseInt(t1[1]) - 1), Integer.parseInt(t1[2]));
+                            c.add(Calendar.MONTH, Integer.parseInt(data6_PeriodCheck));
+                            String zero = "";
+                            if (c.get(Calendar.DATE) < 10) zero = "0";
+                            String zero2 = "";
+                            if (c.get(Calendar.MONTH) < 9) zero2 = "0";
+                            data8 = c.get(Calendar.YEAR) + "-" + zero2 + (c.get(Calendar.MONTH) + 1) + "-" + zero + c.get(Calendar.DATE);
+                        }
+                    } else {
+                        String[] t1 = data7_OldCheck.split("-");
+                        c.set(Integer.parseInt(t1[0]), (Integer.parseInt(t1[1]) - 1), Integer.parseInt(t1[2]));
+                        c.add(Calendar.MONTH, Integer.parseInt(data6_PeriodCheck));
+                        String zero = "";
+                        if (c.get(Calendar.DATE) < 10) zero = "0";
+                        String zero2 = "";
+                        if (c.get(Calendar.MONTH) < 9) zero2 = "0";
+                        data8 = c.get(Calendar.YEAR) + "-" + zero2 + (c.get(Calendar.MONTH) + 1) + "-" + zero + c.get(Calendar.DATE);
+                        data11 = c.getTimeInMillis();
+                    }
+                }
+
+                DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+                GregorianCalendar g = (GregorianCalendar) Calendar.getInstance();
+                if (add) {
+                    uid = mDatabase.child("equipments").push().getKey();
+                    mDatabase.child("equipments").child(uid).child("createdAt").setValue(g.getTimeInMillis());
+                    mDatabase.child("equipments").child(uid).child("createdBy").setValue(user);
+                    mDatabase.child("equipments").child(uid).child("data01").setValue(size + 1);
+                }
+                mDatabase.child("equipments").child(uid).child("data02").setValue(editText2.getText().toString().trim());
+                mDatabase.child("equipments").child(uid).child("data03").setValue(editText3.getText().toString().trim());
+                mDatabase.child("equipments").child(uid).child("data04").setValue(editText4.getText().toString().trim());
+                mDatabase.child("equipments").child(uid).child("data05").setValue(editText5.getText().toString().trim());
+                mDatabase.child("equipments").child(uid).child("data06").setValue(data6_PeriodCheck);
+                mDatabase.child("equipments").child(uid).child("data07").setValue(data7_OldCheck);
+                mDatabase.child("equipments").child(uid).child("data08").setValue(data8);
+                mDatabase.child("equipments").child(uid).child("data09").setValue(data9_Konservacia);
+                mDatabase.child("equipments").child(uid).child("data10").setValue(data10_RazKonservacia);
+                mDatabase.child("equipments").child(uid).child("data11").setValue(data11);
+                mDatabase.child("equipments").child(uid).child("data12").setValue(editText12.getText().toString().trim());
+                if (!add) {
+                    mDatabase.child("equipments").child(uid).child("editedAt").setValue(g.getTimeInMillis());
+                    mDatabase.child("equipments").child(uid).child("editedBy").setValue(user);
+                }
+                dialog.cancel();
+            } else {
+                LinearLayout layout = new LinearLayout(getActivity());
+                layout.setBackgroundResource(R.color.colorPrimary);
+                TextView toast = new TextView(getActivity());
+                toast.setTextColor(getResources().getColor(R.color.colorIcons));
+                toast.setPadding(10, 10, 10, 10);
+                toast.setText("Ошибка");
+                toast.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+                layout.addView(toast);
+                Toast mes = new Toast(getActivity());
+                mes.setDuration(Toast.LENGTH_LONG);
+                mes.setView(layout);
+                mes.show();
+            }
         });
         builder.setNegativeButton("Отмена", (dialog, which) -> dialog.cancel());
         AlertDialog alert = builder.create();

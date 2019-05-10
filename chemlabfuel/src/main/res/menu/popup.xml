@@ -3,7 +3,7 @@
     <item
         android:id="@+id/menu_redoktor"
         android:title="Редактировать" />
-    <!--<item
+    <item
         android:id="@+id/menu_remove"
-        android:title="@string/delite" />-->
+        android:title="Удалить" />
 </menu>

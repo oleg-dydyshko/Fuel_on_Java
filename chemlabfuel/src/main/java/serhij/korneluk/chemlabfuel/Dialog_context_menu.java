@@ -15,7 +15,7 @@ import androidx.fragment.app.DialogFragment;
 
 public class Dialog_context_menu extends DialogFragment {
 
-    public static Dialog_context_menu getInstance(int position, String name) {
+    static Dialog_context_menu getInstance(int position, String name) {
         Dialog_context_menu Instance = new Dialog_context_menu();
         Bundle args = new Bundle();
         args.putInt("position", position);
@@ -26,7 +26,8 @@ public class Dialog_context_menu extends DialogFragment {
 
     interface Dialog_context_menu_Listener {
         void onDialogEditPosition(int position);
-        //void onDialogDeliteClick(int position, String name);
+
+        void onDialogDeliteClick(int position);
     }
 
     private Dialog_context_menu_Listener mListener;
@@ -67,16 +68,16 @@ public class Dialog_context_menu extends DialogFragment {
             mListener.onDialogEditPosition(getArguments().getInt("position", 0));
         });
         linearLayout.addView(textView);
-        /*TextView textView2 = new TextView(getActivity());
+        TextView textView2 = new TextView(getActivity());
         textView2.setPadding(10, 20, 10, 20);
         textView2.setText("Выдаліць");
         textView2.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         textView2.setTextColor(getResources().getColor(R.color.colorPrimary_text));
         textView2.setOnClickListener((v) -> {
             getDialog().cancel();
-            mListener.onDialogDeliteClick(getArguments().getInt("position", 0), getArguments().getString("name", ""));
+            mListener.onDialogDeliteClick(getArguments().getInt("position", 0));
         });
-        linearLayout.addView(textView2);*/
+        linearLayout.addView(textView2);
         builder.setView(linearLayout);
         return builder.create();
     }

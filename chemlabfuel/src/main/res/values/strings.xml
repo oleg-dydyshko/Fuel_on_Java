@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Топливо</string>
+    <string name="app_name">Лаборатория \"Топливо\" ГСКБ</string>
     <string name="app_main">Журнал учета оборудования (СИ и ИО)</string>
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Пароль</string>
