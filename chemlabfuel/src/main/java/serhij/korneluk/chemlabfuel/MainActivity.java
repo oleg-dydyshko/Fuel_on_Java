@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
-import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.AbsoluteSizeSpan;
 import android.util.TypedValue;
@@ -48,6 +47,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -63,13 +63,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private ListView listView;
     private ProgressBar progressBar;
     private ArrayList<String> inventarny_spisok = new ArrayList<>();
-    private ArrayList<HashMap> inventarny_spisok_data = new ArrayList<>();
+    //private ArrayList<ArrayMap<String, String>> inventarny_spisok_data = new ArrayList<>();
     private ArrayAdapter<String> arrayAdapter;
     private ArrayList<ArrayList<String>> users = new ArrayList<>();
-    private ArrayList<ArrayList<Long>> notifications = new ArrayList<>();
     private TextView textView;
     private Dialod_opisanie_edit edit;
     private String userEdit;
+    public static InventorySpisok[] InventorySpisok;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,13 +148,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         String zero = "";
         String zero2 = "";
         String editedString = "";
-        if (inventarny_spisok_data.get(position).get("editedAt") != null && inventarny_spisok_data.get(position).get("editedBy") != null) {
-            long edited;
-            if (inventarny_spisok_data.get(position).get("editedAt") instanceof Double)
-                edited = (long) (double) inventarny_spisok_data.get(position).get("editedAt");
-            else
-                edited = (long) inventarny_spisok_data.get(position).get("editedAt");
-            String editedBy = (String) inventarny_spisok_data.get(position).get("editedBy");
+        if (!InventorySpisok[position].editedBy.equals("")) {
+            long edited = InventorySpisok[position].editedAt;
+            String editedBy = InventorySpisok[position].editedBy;
             for (int i = 0; i < users.size(); i++) {
                 if (users.get(i).get(0).contains(editedBy)) {
                     fn = users.get(i).get(1);
@@ -168,7 +164,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             if (c.get(Calendar.MONTH) < 9) zero2 = "0";
             editedString = " Изменено " + zero + c.get(Calendar.DATE) + "." + zero2 + (c.get(Calendar.MONTH) + 1) + "." + c.get(Calendar.YEAR) + " " + fn + " " + ln;
         }
-        String createBy = (String) inventarny_spisok_data.get(position).get("createdBy");
+        String createBy = InventorySpisok[position].createdBy;
         for (int i = 0; i < users.size(); i++) {
             if (users.get(i).get(0).contains(createBy)) {
                 fnG = users.get(i).get(1);
@@ -176,44 +172,54 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 break;
             }
         }
-        String data02 = (String) inventarny_spisok_data.get(position).get("data02");
-        String builder = "<strong>Марка, тип</strong><br>" + inventarny_spisok_data.get(position).get("data03") + "<br><br>" +
-                "<strong>Заводской номер (инв. номер)</strong><br>" + inventarny_spisok_data.get(position).get("data04") + "<br><br>" +
-                "<strong>Год выпуска (ввода в эксплуатацию)</strong><br>" + inventarny_spisok_data.get(position).get("data05") + "<br><br>" +
-                "<strong>Периодичность метролог. аттестации, поверки, калибровки, мес.</strong><br>" + inventarny_spisok_data.get(position).get("data06") + "<br><br>" +
-                "<strong>Дата последней аттестации, поверки, калибровки</strong><br>" + inventarny_spisok_data.get(position).get("data07") + "<br><br>" +
-                "<strong>Дата следующей аттестации, поверки, калибровки</strong><br>" + inventarny_spisok_data.get(position).get("data08") + "<br><br>" +
-                "<strong>Дата консервации</strong><br>" + inventarny_spisok_data.get(position).get("data09") + "<br><br>" +
-                "<strong>Дата расконсервации</strong><br>" + inventarny_spisok_data.get(position).get("data10") + "<br><br>" +
+        String data02 = InventorySpisok[position].data02;
+        String builder = "<strong>Марка, тип</strong><br>" + InventorySpisok[position].data03 + "<br><br>" +
+                "<strong>Заводской номер (инв. номер)</strong><br>" + InventorySpisok[position].data04 + "<br><br>" +
+                "<strong>Год выпуска (ввода в эксплуатацию)</strong><br>" + InventorySpisok[position].data05 + "<br><br>" +
+                "<strong>Периодичность метролог. аттестации, поверки, калибровки, мес.</strong><br>" + InventorySpisok[position].data06 + "<br><br>" +
+                "<strong>Дата последней аттестации, поверки, калибровки</strong><br>" + InventorySpisok[position].data07 + "<br><br>" +
+                "<strong>Дата следующей аттестации, поверки, калибровки</strong><br>" + InventorySpisok[position].data08 + "<br><br>" +
+                "<strong>Дата консервации</strong><br>" + InventorySpisok[position].data09 + "<br><br>" +
+                "<strong>Дата расконсервации</strong><br>" + InventorySpisok[position].data10 + "<br><br>" +
                 "<strong>Ответственный</strong><br>" + fnG + " " + lnG + "<br><br>" +
-                "<strong>Примечания</strong><br>" + inventarny_spisok_data.get(position).get("data12") + editedString;
+                "<strong>Примечания</strong><br>" + InventorySpisok[position].data12 + editedString;
         Dialod_opisanie opisanie = Dialod_opisanie.getInstance(data02, builder);
         opisanie.show(getSupportFragmentManager(), "opisanie");
     }
 
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-        Dialog_context_menu menu = Dialog_context_menu.getInstance(position, (String) inventarny_spisok_data.get(position).get("data02"));
+        Dialog_context_menu menu = Dialog_context_menu.getInstance(position, InventorySpisok[position].data02);
         menu.show(getSupportFragmentManager(), "menu");
         return true;
     }
 
     @Override
     public void onDialogEditPosition(int position) {
-        edit = Dialod_opisanie_edit.getInstance(userEdit, (String) inventarny_spisok_data.get(position).get("uid"), (String) inventarny_spisok_data.get(position).get("data02"), (String) inventarny_spisok_data.get(position).get("data03"), (String) inventarny_spisok_data.get(position).get("data04"), (String) inventarny_spisok_data.get(position).get("data05"), (String) inventarny_spisok_data.get(position).get("data06"), (String) inventarny_spisok_data.get(position).get("data07"), (String) inventarny_spisok_data.get(position).get("data08"), (String) inventarny_spisok_data.get(position).get("data09"), (String) inventarny_spisok_data.get(position).get("data10"), (String) inventarny_spisok_data.get(position).get("data12"));
-        edit.show(getSupportFragmentManager(), "edit");
+        if (isNetworkAvailable()) {
+            edit = Dialod_opisanie_edit.getInstance(userEdit, InventorySpisok[position].uid, InventorySpisok[position].data02, InventorySpisok[position].data03, InventorySpisok[position].data04, InventorySpisok[position].data05, InventorySpisok[position].data06, InventorySpisok[position].data07, InventorySpisok[position].data08, InventorySpisok[position].data09, InventorySpisok[position].data10, InventorySpisok[position].data12);
+            edit.show(getSupportFragmentManager(), "edit");
+        } else {
+            Dialog_no_internet internet = new Dialog_no_internet();
+            internet.show(getSupportFragmentManager(), "internet");
+        }
     }
 
     @Override
     public void onDialogDeliteClick(int position) {
-        Dialog_delite_confirm confirm = Dialog_delite_confirm.getInstance((String) inventarny_spisok_data.get(position).get("data02"), position);
-        confirm.show(getSupportFragmentManager(), "confirm");
+        if (isNetworkAvailable()) {
+            Dialog_delite_confirm confirm = Dialog_delite_confirm.getInstance(InventorySpisok[position].data02, position);
+            confirm.show(getSupportFragmentManager(), "confirm");
+        } else {
+            Dialog_no_internet internet = new Dialog_no_internet();
+            internet.show(getSupportFragmentManager(), "internet");
+        }
     }
 
     @Override
     public void delite_data(int position) {
         DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-        mDatabase.child("equipments").child((String) inventarny_spisok_data.get(position).get("uid")).removeValue();
+        mDatabase.child("equipments").child(InventorySpisok[position].uid).removeValue();
     }
 
     @Override
@@ -237,6 +243,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             menu.findItem(R.id.exit).setVisible(false);
         else
             menu.findItem(R.id.exit).setVisible(true);
+        SharedPreferences fuel = getSharedPreferences("fuel", Context.MODE_PRIVATE);
+        int sort = fuel.getInt("sort", 0);
+        if (sort == 0) {
+            menu.findItem(R.id.sortdate).setChecked(false);
+            menu.findItem(R.id.sorttime).setChecked(false);
+        }
+        if (sort == 1) {
+            menu.findItem(R.id.sortdate).setChecked(true);
+            menu.findItem(R.id.sorttime).setChecked(false);
+        }
+        if (sort == 2) {
+            menu.findItem(R.id.sorttime).setChecked(true);
+            menu.findItem(R.id.sortdate).setChecked(false);
+        }
         return true;
     }
 
@@ -244,8 +264,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.add) {
-            edit = Dialod_opisanie_edit.getInstance(userEdit, (long) inventarny_spisok_data.size());
-            edit.show(getSupportFragmentManager(), "edit");
+            if (isNetworkAvailable()) {
+                edit = Dialod_opisanie_edit.getInstance(userEdit, (long) InventorySpisok.length);
+                edit.show(getSupportFragmentManager(), "edit");
+            } else {
+                Dialog_no_internet internet = new Dialog_no_internet();
+                internet.show(getSupportFragmentManager(), "internet");
+            }
         }
         if (id == R.id.exit) {
             mAuth.signOut();
@@ -254,6 +279,44 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             userpass.setVisibility(View.VISIBLE);
             login.setVisibility(View.VISIBLE);
             textView.setVisibility(View.VISIBLE);
+        }
+        if (id == R.id.sortdate) {
+            SharedPreferences fuel = getSharedPreferences("fuel", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = fuel.edit();
+            if (item.isChecked()) {
+                editor.putInt("sort", 0);
+                editor.apply();
+                Arrays.sort(InventorySpisok);
+            } else {
+                editor.putInt("sort", 1);
+                editor.apply();
+                Arrays.sort(InventorySpisok);
+            }
+            inventarny_spisok.clear();
+            for (InventorySpisok inventorySpisok : InventorySpisok) {
+                inventarny_spisok.add(inventorySpisok.data01 + ". " + inventorySpisok.data02);
+            }
+            arrayAdapter.notifyDataSetChanged();
+            supportInvalidateOptionsMenu();
+        }
+        if (id == R.id.sorttime) {
+            SharedPreferences fuel = getSharedPreferences("fuel", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = fuel.edit();
+            if (item.isChecked()) {
+                editor.putInt("sort", 0);
+                editor.apply();
+                Arrays.sort(InventorySpisok);
+            } else {
+                editor.putInt("sort", 2);
+                editor.apply();
+                Arrays.sort(InventorySpisok);
+            }
+            inventarny_spisok.clear();
+            for (InventorySpisok inventorySpisok : InventorySpisok) {
+                inventarny_spisok.add(inventorySpisok.data01 + ". " + inventorySpisok.data02);
+            }
+            arrayAdapter.notifyDataSetChanged();
+            supportInvalidateOptionsMenu();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -267,49 +330,36 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 mDatabase.child("equipments").addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        SharedPreferences fuel = getSharedPreferences("fuel", Context.MODE_PRIVATE);
-                        Type type2 = new TypeToken<ArrayList<ArrayList<Long>>>() {
-                        }.getType();
-                        Gson gson = new Gson();
-                        String notifi = fuel.getString("notifi", "");
-                        ArrayList<ArrayList<Long>> temp;
-                        if (!notifi.equals("")) {
-                            temp = new ArrayList<>(gson.fromJson(notifi, type2));
-                        } else {
-                            temp = new ArrayList<>();
+                        int size = 0;
+                        for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                            if (postSnapshot.getValue() instanceof HashMap) {
+                                HashMap hashMap = (HashMap) postSnapshot.getValue();
+                                if (hashMap.size() > 12) {
+                                    size++;
+                                }
+                            }
                         }
-                        int i = 0;
-                        inventarny_spisok.clear();
-                        inventarny_spisok_data.clear();
+                        InventorySpisok = new InventorySpisok[size];
+                        size = 0;
                         for (DataSnapshot data : dataSnapshot.getChildren()) {
                             if (data.getValue() instanceof HashMap) {
                                 HashMap hashMap = (HashMap) data.getValue();
-                                inventarny_spisok_data.add(hashMap);
                                 if (hashMap.size() > 12) {
-                                    String uid = (String) hashMap.get("uid");
-                                    if (uid == null)
-                                        hashMap.put("uid", data.getKey());
-                                    long data11 = 0;
-                                    if (hashMap.get("data11") != null)
-                                        data11 = (long) hashMap.get("data11");
-                                    inventarny_spisok.add(hashMap.get("data01") + ". " + hashMap.get("data02"));
-                                    ArrayList<Long> notif = new ArrayList<>();
-                                    notif.add((long) hashMap.get("data01"));
-                                    notif.add(data11);
-                                    if (temp.size() < i) {
-                                        if (temp.size() == 0)
-                                            notif.add(1L);
-                                        else if (temp.get(i).get(1) != data11)
-                                            notif.add(1L);
-                                        else
-                                            notif.add(0L);
-                                    } else {
-                                        notif.add(1L);
-                                    }
-                                    notifications.add(notif);
-                                    i++;
+                                    Object editedAt = hashMap.get("editedAt");
+                                    Object editedBy = hashMap.get("editedBy");
+                                    if (hashMap.get("editedAt") == null)
+                                        editedAt = 0L;
+                                    if (hashMap.get("editedBy") == null)
+                                        editedBy = "";
+                                    InventorySpisok[size] = new InventorySpisok(MainActivity.this, (String) hashMap.get("createdBy"), (long) hashMap.get("data01"), (String) hashMap.get("data02"), (String) hashMap.get("data03"), (String) hashMap.get("data04"), (String) hashMap.get("data05"), (String) hashMap.get("data06"), (String) hashMap.get("data07"), (String) hashMap.get("data08"), (String) hashMap.get("data09"), (String) hashMap.get("data10"), (long) hashMap.get("data11"), (String) hashMap.get("data12"), data.getKey(), (long) editedAt, (String) editedBy);
+                                    size++;
                                 }
                             }
+                        }
+                        Arrays.sort(InventorySpisok);
+                        inventarny_spisok.clear();
+                        for (InventorySpisok inventorySpisok : InventorySpisok) {
+                            inventarny_spisok.add(inventorySpisok.data01 + ". " + inventorySpisok.data02);
                         }
                         listView.setVisibility(View.VISIBLE);
                         useremail.setVisibility(View.GONE);
@@ -318,10 +368,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         textView.setVisibility(View.GONE);
                         arrayAdapter.notifyDataSetChanged();
                         progressBar.setVisibility(View.GONE);
-                        SharedPreferences.Editor editor = fuel.edit();
-                        editor.putString("fuel_data", gson.toJson(inventarny_spisok_data));
-                        editor.putString("notifi", gson.toJson(notifications));
-                        editor.apply();
+
                         Intent intent = new Intent(MainActivity.this, ReceiverSetAlarm.class);
                         sendBroadcast(intent);
                     }
@@ -367,13 +414,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 String g = fuel.getString("fuel_data", "");
                 if (!g.equals("")) {
                     Gson gson = new Gson();
-                    Type type = new TypeToken<ArrayList<HashMap>>() {
+                    Type type = new TypeToken<InventorySpisok[]>() {
                     }.getType();
-                    inventarny_spisok_data.addAll(gson.fromJson(g, type));
-                    for (int i = 0; i < inventarny_spisok_data.size(); i++) {
-                        HashMap hashMap = inventarny_spisok_data.get(i);
-                        int data01 = (int) (double) hashMap.get("data01");
-                        inventarny_spisok.add(data01 + ". " + hashMap.get("data02"));
+                    InventorySpisok = gson.fromJson(g, type);
+                    for (InventorySpisok inventorySpisok : InventorySpisok) {
+                        inventarny_spisok.add(inventorySpisok.data01 + ". " + inventorySpisok.data02);
                     }
                     String us = fuel.getString("users", "");
                     Type type2 = new TypeToken<ArrayList<ArrayList<String>>>() {
@@ -435,29 +480,51 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             } else {
                 viewHolder = (ViewHolder) mView.getTag();
             }
-            viewHolder.button_popup.setOnClickListener((v -> showPopupMenu(viewHolder.button_popup, position, inventarny_spisok.get(position))));
-            long data;
-            if (inventarny_spisok_data.get(position).get("data11") instanceof Double) {
-                data = (long) (double) inventarny_spisok_data.get(position).get("data11");
-            } else {
-                if (inventarny_spisok_data.get(position).get("data11") != null)
-                    data = (long) inventarny_spisok_data.get(position).get("data11");
-                else data = 0;
-            }
-            GregorianCalendar g = new GregorianCalendar();
-            g.setTimeInMillis(data);
+            viewHolder.button_popup.setOnClickListener((v -> showPopupMenu(viewHolder.button_popup, position)));
+            GregorianCalendar g = (GregorianCalendar) Calendar.getInstance();
+            long real = g.getTimeInMillis();
             String dataLong = "";
-            GregorianCalendar real = (GregorianCalendar) Calendar.getInstance();
-            if (g.getTimeInMillis() - real.getTimeInMillis() > 0L && g.getTimeInMillis() - real.getTimeInMillis() < 45L * 24L * 60L * 60L * 1000L) {
-                dataLong = "<br><font color=#9a2828>Осталось " + (g.get(Calendar.DATE) - real.get(Calendar.DATE)) + " дней(-я)</font>";
-            } else if (g.getTimeInMillis() - real.getTimeInMillis() < 0L) {
-                dataLong = "<br><font color=#9a2828>Просрочено</font>";
+            String data8 = InventorySpisok[position].data08;
+            if (data8 != null && !data8.equals("")) {
+                String[] t1 = data8.split("-");
+                GregorianCalendar calendar = new GregorianCalendar();
+                String data09 = InventorySpisok[position].data09;
+                String data10 = InventorySpisok[position].data10;
+                if (data09 != null && !data09.equals("")) {
+                    String[] t2 = data09.split("-");
+                    calendar.set(Integer.parseInt(t2[0]), Integer.parseInt(t2[1]) - 1, Integer.parseInt(t2[2]));
+                    long t2l = calendar.getTimeInMillis();
+                    if (data10 != null && !data10.equals("")) {
+                        String[] t3 = data10.split("-");
+                        calendar.set(Integer.parseInt(t3[0]), Integer.parseInt(t3[1]) - 1, Integer.parseInt(t3[2]));
+                        long t3l = calendar.getTimeInMillis();
+                        if (t2l < t3l) {
+                            g.set(Integer.parseInt(t1[0]), Integer.parseInt(t1[1]) - 1, Integer.parseInt(t1[2]));
+                            if (g.getTimeInMillis() - real > 0L && g.getTimeInMillis() - real < 45L * 24L * 60L * 60L * 1000L) {
+                                long dat = g.getTimeInMillis() - real;
+                                g.setTimeInMillis(dat);
+                                dataLong = "<br><font color=#9a2828>Осталось " + (g.get(Calendar.DAY_OF_YEAR) - 1) + " дней(-я)</font>";
+                            } else if (g.getTimeInMillis() - real < 0L) {
+                                dataLong = "<br><font color=#9a2828>Просрочено</font>";
+                            }
+                        }
+                    }
+                } else {
+                    g.set(Integer.parseInt(t1[0]), Integer.parseInt(t1[1]) - 1, Integer.parseInt(t1[2]));
+                    if (g.getTimeInMillis() - real > 0L && g.getTimeInMillis() - real < 45L * 24L * 60L * 60L * 1000L) {
+                        long dat = g.getTimeInMillis() - real;
+                        g.setTimeInMillis(dat);
+                        dataLong = "<br><font color=#9a2828>Осталось " + (g.get(Calendar.DAY_OF_YEAR) - 1) + " дней(-я)</font>";
+                    } else if (g.getTimeInMillis() - real < 0L) {
+                        dataLong = "<br><font color=#9a2828>Просрочено</font>";
+                    }
+                }
             }
             viewHolder.text.setText(Html.fromHtml(inventarny_spisok.get(position) + dataLong));
             return mView;
         }
 
-        private void showPopupMenu(View view, int position, String name) {
+        private void showPopupMenu(View view, int position) {
             PopupMenu popup = new PopupMenu(MainActivity.this, view);
             MenuInflater infl = popup.getMenuInflater();
             infl.inflate(R.menu.popup, popup.getMenu());

@@ -7,8 +7,8 @@ android {
         applicationId "serhij.korneluk.chemlabfuel"
         minSdkVersion 16
         targetSdkVersion 28
-        versionCode 5
-        versionName "1.0.5"
+        versionCode 6
+        versionName "1.0.6"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -20,6 +20,11 @@ android {
     compileOptions {
         sourceCompatibility = '1.8'
         targetCompatibility = '1.8'
+    }
+    bundle {
+        density.enableSplit = true
+        language.enableSplit = false
+        abi.enableSplit = true
     }
 }
 

@@ -7,7 +7,18 @@
         android:orderInCategory="100"
         android:title="@string/exit"
         app:showAsAction="always" />
-
+    <item
+        android:id="@+id/sortdate"
+        android:checkable="true"
+        android:orderInCategory="100"
+        android:title="Сортировка по алфавиту"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/sorttime"
+        android:checkable="true"
+        android:orderInCategory="100"
+        android:title="Сортировка по времени"
+        app:showAsAction="never" />
     <item
         android:id="@+id/exit"
         android:orderInCategory="100"
