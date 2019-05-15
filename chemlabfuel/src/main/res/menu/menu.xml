@@ -11,13 +11,18 @@
         android:id="@+id/sortdate"
         android:checkable="true"
         android:orderInCategory="100"
-        android:title="Сортировка по алфавиту"
+        android:title="@string/sort_alf"
         app:showAsAction="never" />
     <item
         android:id="@+id/sorttime"
         android:checkable="true"
         android:orderInCategory="100"
-        android:title="Сортировка по времени"
+        android:title="@string/sort_time"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/settings"
+        android:orderInCategory="100"
+        android:title="@string/settings"
         app:showAsAction="never" />
     <item
         android:id="@+id/exit"

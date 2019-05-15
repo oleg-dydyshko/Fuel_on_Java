@@ -5,4 +5,33 @@
     <string name="prompt_password">Пароль</string>
     <string name="action_sign_in">Войти</string>
     <string name="exit">Выйти</string>
+    <string name="today">Сегодня</string>
+    <string name="add_1">-1 год</string>
+    <string name="add1_1">+1 год</string>
+    <string name="name_oborudovanie">Наименование оборудования (ИО, СИ)</string>
+    <string name="marka_typ">Марка, тип</string>
+    <string name="zavod_nomer">Заводской номер (инв. номер)</string>
+    <string name="god_vypuska">Год выпуска (ввода в эксплуатацию)</string>
+    <string name="period_met_ates_ghjverki">Периодичность метролог. аттестации, поверки, калибровки, мес.</string>
+    <string name="data_posledney_atestacyu">Дата последней аттестации, поверки, калибровки</string>
+    <string name="getdate">Выберите дату</string>
+    <string name="data_konserv">Дата консервации</string>
+    <string name="get_date_rekonserv">Дата расконсервации</string>
+    <string name="primechania">Примечания</string>
+    <string name="sort_alf">Сортировка по алфавиту</string>
+    <string name="sort_time">Сортировка по времени</string>
+    <string name="settings">Настройки</string>
+    <string name="edit">Редактировать</string>
+    <string name="delite">Удалить</string>
+    <string name="notifi">Уведомления:</string>
+    <string name="remove">Удалить?</string>
+    <string name="remove_conform">Вы действительно хотите удалить \"%1$s\"?</string>
+    <string name="cansel">Отмена</string>
+    <string name="text_size">Размер текста (%1$d)</string>
+    <string name="good">Хорошо</string>
+    <string name="error">Ошибка</string>
+    <string name="save">Сохранить</string>
+    <string name="add">Добавить запись</string>
+    <string name="set_date">%1$d-%2$s%3$d-%4$s%5$d</string>
+    <!--%1$s is a string and %2$d is a decimal number-->
 </resources>

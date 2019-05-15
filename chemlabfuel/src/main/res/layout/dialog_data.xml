@@ -26,7 +26,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:padding="10dp"
-            android:text="Сегодня"
+            android:text="@string/today"
             android:textColor="@color/colorPrimary_text" />
 
         <TextView
@@ -36,7 +36,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:padding="10dp"
-            android:text="-1 год"
+            android:text="@string/add_1"
             android:textColor="@color/colorPrimary_text" />
 
         <TextView
@@ -46,7 +46,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:padding="10dp"
-            android:text="+1 год"
+            android:text="@string/add1_1"
             android:textColor="@color/colorPrimary_text" />
 
     </LinearLayout>

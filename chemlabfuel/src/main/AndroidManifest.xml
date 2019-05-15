@@ -32,6 +32,13 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:label="@string/app_main">
         </activity>
+        <activity android:name=".SettingsActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:label="Настройки">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
         <receiver android:name=".ReceiverNotification" />
         <receiver android:name=".ReceiverSetAlarm" />
         <receiver

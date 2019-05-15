@@ -74,19 +74,19 @@ public class Dialod_opisanie_edit extends DialogFragment {
                 if (year == 0)
                     editText7.setText("");
                 else
-                    editText7.setText(year + "-" + zero + (month + 1) + "-" + zero2 + dayOfMonth);
+                    editText7.setText(getString(R.string.set_date, year, zero, month + 1, zero2, dayOfMonth));
                 break;
             case 9:
                 if (year == 0)
                     editText9.setText("");
                 else
-                    editText9.setText(year + "-" + zero + (month + 1) + "-" + zero2 + dayOfMonth);
+                    editText9.setText(getString(R.string.set_date, year, zero, month + 1, zero2, dayOfMonth));
                 break;
             case 10:
                 if (year == 0)
                     editText10.setText("");
                 else
-                    editText10.setText(year + "-" + zero + (month + 1) + "-" + zero2 + dayOfMonth);
+                    editText10.setText(getString(R.string.set_date, year, zero, month + 1, zero2, dayOfMonth));
                 break;
         }
     }
@@ -167,7 +167,7 @@ public class Dialod_opisanie_edit extends DialogFragment {
             add = false;
 
         if (add)
-            editTextTitle.setText("Добавить запись");
+            editTextTitle.setText(R.string.add);
         else
             editTextTitle.setText(data2);
         editText2.setText(data2);
@@ -192,7 +192,7 @@ public class Dialod_opisanie_edit extends DialogFragment {
         //imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
         builder.setView(view);
 
-        builder.setPositiveButton("Сохранить", (dialog, which) -> {
+        builder.setPositiveButton(getString(R.string.save), (dialog, which) -> {
             data9_Konservacia = editText9.getText().toString().trim();
             data10_RazKonservacia = editText10.getText().toString().trim();
             data7_OldCheck = editText7.getText().toString().trim();
@@ -203,17 +203,17 @@ public class Dialod_opisanie_edit extends DialogFragment {
                 data11 = c.getTimeInMillis();
                 if (data6_PeriodCheck != null && !data6_PeriodCheck.equals("")) {
                     if (data9_Konservacia != null && !data9_Konservacia.equals("")) {
+                        String[] tk = data9_Konservacia.split("-");
+                        c.set(Integer.parseInt(tk[0]), (Integer.parseInt(tk[1]) - 1), Integer.parseInt(tk[2]));
+                        long start = c.getTimeInMillis();
                         if (data10_RazKonservacia != null && !data10_RazKonservacia.equals("")) {
-                            String[] tk = data9_Konservacia.split("-");
                             String[] tr = data10_RazKonservacia.split("-");
-                            c.set(Integer.parseInt(tk[0]), (Integer.parseInt(tk[1]) - 1), Integer.parseInt(tk[2]));
-                            long start = c.getTimeInMillis();
                             c.set(Integer.parseInt(tr[0]), (Integer.parseInt(tr[1]) - 1), Integer.parseInt(tr[2]));
                             long end = c.getTimeInMillis();
                             if (start > end) {
-                                GregorianCalendar g = (GregorianCalendar) Calendar.getInstance();
-                                g.add(Calendar.YEAR, 20);
-                                data11 = g.getTimeInMillis();
+                                c.setTimeInMillis(start);
+                                c.add(Calendar.YEAR, 20);
+                                data11 = c.getTimeInMillis();
                                 String zero = "";
                                 if (c.get(Calendar.DATE) < 10) zero = "0";
                                 String zero2 = "";
@@ -234,9 +234,9 @@ public class Dialod_opisanie_edit extends DialogFragment {
                                 data11 = c.getTimeInMillis();
                             }
                         } else {
-                            GregorianCalendar g = (GregorianCalendar) Calendar.getInstance();
-                            g.add(Calendar.YEAR, 20);
-                            data11 = g.getTimeInMillis();
+                            c.setTimeInMillis(start);
+                            c.add(Calendar.YEAR, 20);
+                            data11 = c.getTimeInMillis();
                             String[] t1 = data7_OldCheck.split("-");
                             c.set(Integer.parseInt(t1[0]), (Integer.parseInt(t1[1]) - 1), Integer.parseInt(t1[2]));
                             c.add(Calendar.MONTH, Integer.parseInt(data6_PeriodCheck));
@@ -289,7 +289,7 @@ public class Dialod_opisanie_edit extends DialogFragment {
                 TextView toast = new TextView(getActivity());
                 toast.setTextColor(getResources().getColor(R.color.colorIcons));
                 toast.setPadding(10, 10, 10, 10);
-                toast.setText("Ошибка");
+                toast.setText(R.string.error);
                 toast.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
                 layout.addView(toast);
                 Toast mes = new Toast(getActivity());
@@ -298,7 +298,7 @@ public class Dialod_opisanie_edit extends DialogFragment {
                 mes.show();
             }
         });
-        builder.setNegativeButton("Отмена", (dialog, which) -> dialog.cancel());
+        builder.setNegativeButton(getString(R.string.cansel), (dialog, which) -> dialog.cancel());
         AlertDialog alert = builder.create();
         alert.setOnShowListener(dialog -> {
             Button btnPositive = alert.getButton(Dialog.BUTTON_POSITIVE);

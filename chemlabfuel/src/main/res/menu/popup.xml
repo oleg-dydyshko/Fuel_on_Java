@@ -2,8 +2,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/menu_redoktor"
-        android:title="Редактировать" />
+        android:title="@string/edit" />
     <item
         android:id="@+id/menu_remove"
-        android:title="Удалить" />
+        android:title="@string/delite" />
 </menu>

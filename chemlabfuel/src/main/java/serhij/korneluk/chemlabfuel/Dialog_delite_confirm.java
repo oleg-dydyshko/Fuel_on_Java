@@ -53,20 +53,20 @@ public class Dialog_delite_confirm extends DialogFragment {
         TextView textViewZaglavie = new TextView(getActivity());
         textViewZaglavie.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
         textViewZaglavie.setPadding(10, 10, 10, 10);
-        textViewZaglavie.setText("Удалить?");
+        textViewZaglavie.setText(R.string.remove);
         textViewZaglavie.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         textViewZaglavie.setTypeface(null, Typeface.BOLD);
         textViewZaglavie.setTextColor(getResources().getColor(R.color.colorIcons));
         linearLayout.addView(textViewZaglavie);
         TextView textView = new TextView(getActivity());
         textView.setPadding(10, 10, 10, 10);
-        textView.setText("Вы действительно хотите удалить \"" + getArguments().getString("title") + "\"?");
+        textView.setText(getString(R.string.remove_conform, getArguments().getString("title")));
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         textView.setTextColor(getResources().getColor(R.color.colorPrimary_text));
         linearLayout.addView(textView);
         ad.setView(linearLayout);
-        ad.setPositiveButton("Удалить", (dialog, which) -> listiner.delite_data(getArguments().getInt("position")));
-        ad.setNegativeButton("Отмена", (dialog, which) -> dialog.cancel());
+        ad.setPositiveButton(getString(R.string.delite), (dialog, which) -> listiner.delite_data(getArguments().getInt("position")));
+        ad.setNegativeButton(getString(R.string.cansel), (dialog, which) -> dialog.cancel());
         AlertDialog alert = ad.create();
         alert.setOnShowListener(dialog -> {
             Button btnPositive = alert.getButton(Dialog.BUTTON_POSITIVE);

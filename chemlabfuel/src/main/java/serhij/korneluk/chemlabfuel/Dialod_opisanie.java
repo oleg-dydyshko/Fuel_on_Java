@@ -47,7 +47,7 @@ public class Dialod_opisanie extends DialogFragment {
         textView.setTextColor(getResources().getColor(R.color.colorPrimary_text));
         linearLayout.addView(scrollView);
         scrollView.addView(textView);
-        builder.setPositiveButton("Хорошо", (dialog, which) -> dialog.cancel());
+        builder.setPositiveButton(getString(R.string.good), (dialog, which) -> dialog.cancel());
         builder.setView(linearLayout);
         AlertDialog alert = builder.create();
         alert.setOnShowListener(dialog -> {

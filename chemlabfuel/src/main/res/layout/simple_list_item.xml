@@ -22,6 +22,5 @@
         android:layout_width="24dp"
         android:layout_height="match_parent"
         android:background="@drawable/btn_drawable"
-        android:contentDescription="Открыть меню"
         android:src="@drawable/button_with_three_dots" />
 </LinearLayout>

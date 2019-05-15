@@ -60,7 +60,7 @@ public class Dialog_context_menu extends DialogFragment {
         linearLayout.addView(textViewZaglavie);
         TextView textView = new TextView(getActivity());
         textView.setPadding(10, 20, 10, 20);
-        textView.setText("Рэдагаваць");
+        textView.setText(R.string.edit);
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         textView.setTextColor(getResources().getColor(R.color.colorPrimary_text));
         textView.setOnClickListener((v) -> {
@@ -70,7 +70,7 @@ public class Dialog_context_menu extends DialogFragment {
         linearLayout.addView(textView);
         TextView textView2 = new TextView(getActivity());
         textView2.setPadding(10, 20, 10, 20);
-        textView2.setText("Выдаліць");
+        textView2.setText(R.string.delite);
         textView2.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         textView2.setTextColor(getResources().getColor(R.color.colorPrimary_text));
         textView2.setOnClickListener((v) -> {

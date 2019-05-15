@@ -22,9 +22,8 @@ public class ReceiverNotification extends BroadcastReceiver {
 
     private void sendNotif(Context context) {
         Intent notificationIntent = new Intent(context, SplashActivity.class);
-        PendingIntent contentIntent = PendingIntent.getActivity(context,
-                0, notificationIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
+        notificationIntent.putExtra("notifications", true);
+        PendingIntent contentIntent = PendingIntent.getActivity(context,0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         Resources res = context.getResources();
         String channelId = "2020";
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId);
