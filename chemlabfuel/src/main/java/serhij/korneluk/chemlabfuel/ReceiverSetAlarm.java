@@ -58,7 +58,7 @@ public class ReceiverSetAlarm extends BroadcastReceiver {
     private void Task(Context context) {
         new Thread(() -> {
             testData.clear();
-            if (MainActivity.InventorySpisok == null) {
+            if (CremLabFuel.InventorySpisok == null) {
                 if (FirebaseAuth.getInstance().getCurrentUser() != null) {
                     if (isNetworkAvailable(context)) {
                         DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
@@ -74,7 +74,7 @@ public class ReceiverSetAlarm extends BroadcastReceiver {
                                         }
                                     }
                                 }
-                                MainActivity.InventorySpisok = new InventorySpisok[size];
+                                CremLabFuel.InventorySpisok = new InventorySpisok[size];
                                 size = 0;
                                 for (DataSnapshot data : dataSnapshot.getChildren()) {
                                     if (data.getValue() instanceof HashMap) {
@@ -86,7 +86,7 @@ public class ReceiverSetAlarm extends BroadcastReceiver {
                                                 editedAt = 0L;
                                             if (hashMap.get("editedBy") == null)
                                                 editedBy = "";
-                                            MainActivity.InventorySpisok[size] = new InventorySpisok(context, (String) hashMap.get("createdBy"), (long) hashMap.get("data01"), (String) hashMap.get("data02"), (String) hashMap.get("data03"), (String) hashMap.get("data04"), (String) hashMap.get("data05"), (String) hashMap.get("data06"), (String) hashMap.get("data07"), (String) hashMap.get("data08"), (String) hashMap.get("data09"), (String) hashMap.get("data10"), (long) hashMap.get("data11"), (String) hashMap.get("data12"), data.getKey(), (long) editedAt, (String) editedBy);
+                                            CremLabFuel.InventorySpisok[size] = new InventorySpisok(context, (String) hashMap.get("createdBy"), (long) hashMap.get("data01"), (String) hashMap.get("data02"), (String) hashMap.get("data03"), (String) hashMap.get("data04"), (String) hashMap.get("data05"), (String) hashMap.get("data06"), (String) hashMap.get("data07"), (String) hashMap.get("data08"), (String) hashMap.get("data09"), (String) hashMap.get("data10"), (long) hashMap.get("data11"), (String) hashMap.get("data12"), data.getKey(), (long) editedAt, (String) editedBy);
                                             size++;
                                         }
                                     }
@@ -113,7 +113,7 @@ public class ReceiverSetAlarm extends BroadcastReceiver {
         long realtime = c.getTimeInMillis();
         c.set(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DATE), 8, 0, 0);
         long time = c.getTimeInMillis();
-        for (InventorySpisok inventarny_spisok_datum : MainActivity.InventorySpisok) {
+        for (InventorySpisok inventarny_spisok_datum : CremLabFuel.InventorySpisok) {
             int data01 = (int) inventarny_spisok_datum.data01;
             removeAlarm(context, data01);
             if (toDataAlarm != 0L) {

@@ -1,6 +1,7 @@
 package serhij.korneluk.chemlabfuel;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.View;
@@ -282,6 +283,7 @@ public class Dialod_opisanie_edit extends DialogFragment {
                     mDatabase.child("equipments").child(uid).child("editedAt").setValue(g.getTimeInMillis());
                     mDatabase.child("equipments").child(uid).child("editedBy").setValue(user);
                 }
+                getActivity().sendBroadcast(new Intent(getActivity(), ReceiverSetAlarm.class));
                 dialog.cancel();
             } else {
                 LinearLayout layout = new LinearLayout(getActivity());
