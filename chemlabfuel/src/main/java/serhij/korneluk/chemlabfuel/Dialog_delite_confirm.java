@@ -19,17 +19,18 @@ public class Dialog_delite_confirm extends DialogFragment {
 
     private Dialog_delite_confirm_listiner listiner;
 
-    static Dialog_delite_confirm getInstance(String title, int position) {
+    static Dialog_delite_confirm getInstance(String title, int groupPosition, int position) {
         Dialog_delite_confirm opisanie = new Dialog_delite_confirm();
         Bundle bundle = new Bundle();
         bundle.putString("title", title);
+        bundle.putInt("groupPosition", groupPosition);
         bundle.putInt("position", position);
         opisanie.setArguments(bundle);
         return opisanie;
     }
 
     interface Dialog_delite_confirm_listiner {
-        void delite_data(int position);
+        void delite_data(int groupPosition, int position);
     }
 
     @Override
@@ -65,7 +66,7 @@ public class Dialog_delite_confirm extends DialogFragment {
         textView.setTextColor(getResources().getColor(R.color.colorPrimary_text));
         linearLayout.addView(textView);
         ad.setView(linearLayout);
-        ad.setPositiveButton(getString(R.string.delite), (dialog, which) -> listiner.delite_data(getArguments().getInt("position")));
+        ad.setPositiveButton(getString(R.string.delite), (dialog, which) -> listiner.delite_data(getArguments().getInt("groupPosition", -1), getArguments().getInt("position")));
         ad.setNegativeButton(getString(R.string.cansel), (dialog, which) -> dialog.cancel());
         AlertDialog alert = ad.create();
         alert.setOnShowListener(dialog -> {

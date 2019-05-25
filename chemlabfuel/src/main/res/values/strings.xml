@@ -35,5 +35,23 @@
     <string name="set_date">%1$d-%2$s%3$d-%4$s%5$d</string>
     <string name="oborudovanie">Оборудование</string>
     <string name="reaktivy">Реактивы</string>
+    <string name="name_reaktiv">Наименование реактива</string>
+    <string name="partia">Партия</string>
+    <string name="postavcik">Поставщик</string>
+    <string name="input_data">Дата получения</string>
+    <string name="pritenzii">Притензии</string>
+    <string name="kvalifikacia">Квалификация</string>
+    <string name="data_izgotovlinia">Дата изготовления</string>
+    <string name="srok_xranetia">Срок хранения</string>
+    <string name="uslovie_xran">Условия хранения</string>
+    <string name="izmerenie">Единица измерения</string>
+    <string name="input_zise">Количество получено</string>
+    <string name="min_kolichestvo">Минимальное количество</string>
+    <string name="add_partia">Добавить партию</string>
+    <string name="obychnye">Обычные</string>
+    <string name="data_spisania">Дата расхода</string>
+    <string name="out_size">Количество</string>
+    <string name="cel">Цель</string>
+    <string name="spisanie">Расход</string>
     <!--%1$s is a string and %2$d is a decimal number-->
 </resources>
