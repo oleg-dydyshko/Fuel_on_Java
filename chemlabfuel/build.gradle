@@ -7,8 +7,8 @@ android {
         applicationId "serhij.korneluk.chemlabfuel"
         minSdkVersion 16
         targetSdkVersion 28
-        versionCode 11
-        versionName "1.1.1"
+        versionCode 14
+        versionName "1.1.4"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

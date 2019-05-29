@@ -27,6 +27,7 @@ import java.util.HashMap;
 public class ReceiverSetAlarm extends BroadcastReceiver {
 
     private ArrayList<String> testData = new ArrayList<>();
+    private ArrayList<ReaktiveSpisok> reaktiveSpisok = new ArrayList<>();
     private long toDataAlarm = 45L;
 
     @Override
@@ -56,44 +57,116 @@ public class ReceiverSetAlarm extends BroadcastReceiver {
     }
 
     private void Task(Context context) {
-        new Thread(() -> {
-            testData.clear();
-            if (CremLabFuel.InventorySpisok == null) {
-                CremLabFuel.InventorySpisok = new ArrayList<>();
-                if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                    if (isNetworkAvailable(context)) {
-                        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-                        mDatabase.child("equipments").addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                for (DataSnapshot data : dataSnapshot.getChildren()) {
-                                    if (data.getValue() instanceof HashMap) {
-                                        HashMap hashMap = (HashMap) data.getValue();
-                                        if (hashMap.size() > 12) {
-                                            Object editedAt = hashMap.get("editedAt");
-                                            Object editedBy = hashMap.get("editedBy");
-                                            if (hashMap.get("editedAt") == null)
-                                                editedAt = 0L;
-                                            if (hashMap.get("editedBy") == null)
-                                                editedBy = "";
-                                            CremLabFuel.InventorySpisok.add(new InventorySpisok((String) hashMap.get("createdBy"), (long) hashMap.get("data01"), (String) hashMap.get("data02"), (String) hashMap.get("data03"), (String) hashMap.get("data04"), (String) hashMap.get("data05"), (String) hashMap.get("data06"), (String) hashMap.get("data07"), (String) hashMap.get("data08"), (String) hashMap.get("data09"), (String) hashMap.get("data10"), (long) hashMap.get("data11"), (String) hashMap.get("data12"), data.getKey(), (long) editedAt, (String) editedBy));
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            if (isNetworkAvailable(context)) {
+                testData.clear();
+                if (CremLabFuel.InventorySpisok == null) {
+                    CremLabFuel.InventorySpisok = new ArrayList<>();
+                    mDatabase.child("equipments").addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            for (DataSnapshot data : dataSnapshot.getChildren()) {
+                                if (data.getValue() instanceof HashMap) {
+                                    HashMap hashMap = (HashMap) data.getValue();
+                                    if (hashMap.size() > 12) {
+                                        Object editedAt = hashMap.get("editedAt");
+                                        Object editedBy = hashMap.get("editedBy");
+                                        if (hashMap.get("editedAt") == null)
+                                            editedAt = 0L;
+                                        if (hashMap.get("editedBy") == null)
+                                            editedBy = "";
+                                        CremLabFuel.InventorySpisok.add(new InventorySpisok((String) hashMap.get("createdBy"), (long) hashMap.get("data01"), (String) hashMap.get("data02"), (String) hashMap.get("data03"), (String) hashMap.get("data04"), (String) hashMap.get("data05"), (String) hashMap.get("data06"), (String) hashMap.get("data07"), (String) hashMap.get("data08"), (String) hashMap.get("data09"), (String) hashMap.get("data10"), (long) hashMap.get("data11"), (String) hashMap.get("data12"), data.getKey(), (long) editedAt, (String) editedBy));
+                                    }
+                                }
+                            }
+                            checkAlarm(context);
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                        }
+                    });
+
+                } else {
+                    checkAlarm(context);
+                }
+
+                mDatabase.child("reagents").addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        reaktiveSpisok.clear();
+                        for (DataSnapshot data : dataSnapshot.getChildren()) {
+                            String id = data.getKey();
+                            GregorianCalendar g = (GregorianCalendar) Calendar.getInstance();
+                            long srokToDay = g.getTimeInMillis();
+                            long data05b = 0;
+                            int srok = 1;// Срок в норме
+                            for (DataSnapshot data2 : data.getChildren()) {
+                                if (data2.getValue() instanceof HashMap) {
+                                    HashMap hashMap = (HashMap) data2.getValue();
+                                    if (hashMap.size() >= 12) {
+                                        String data05 = (String) data2.child("data05").getValue();
+                                        String[] d = data05.split("-");
+                                        if (d.length == 3)
+                                            g.set(Integer.parseInt(d[0]), Integer.parseInt(d[1]) - 1, Integer.parseInt(d[2]));
+                                        else
+                                            g.set(Integer.parseInt(d[0]), Integer.parseInt(d[1]) - 1, 1);
+                                        g.add(Calendar.MONTH, (int) (long) data2.child("data06").getValue());
+                                        data05b = g.getTimeInMillis();
+                                        if (srokToDay < g.getTimeInMillis()) {
+                                            g.add(Calendar.DATE, (int) -toDataAlarm);
+                                            if (srokToDay > g.getTimeInMillis()) {
+                                                srok = 0; // Истекает срок
+                                            } else {
+                                                srok = 1; // Срок в норме
+                                            }
+                                        } else {
+                                            srok = -1; // Срок истёк
                                         }
                                     }
                                 }
-                                checkAlarm(context);
                             }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-                            }
-                        });
+                            reaktiveSpisok.add(new ReaktiveSpisok(data05b, Integer.parseInt(id), srok));
+                        }
+                        checkAlarmReaktive(context);
                     }
-                }
-            } else {
-                checkAlarm(context);
-            }
 
-        }).start();
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                    }
+                });
+            }
+        }
+    }
+
+    private void checkAlarmReaktive(Context context) {
+        GregorianCalendar c = (GregorianCalendar) Calendar.getInstance();
+        long realtime = c.getTimeInMillis();
+        c.set(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DATE), 8, 0, 0);
+        long time = c.getTimeInMillis();
+        for (ReaktiveSpisok reaktiveSpisok : reaktiveSpisok) {
+            removeAlarm(context, reaktiveSpisok.id * 100);
+            if (toDataAlarm != 0L) {
+                switch (reaktiveSpisok.check) {
+                    case 1:
+                        c.setTimeInMillis(reaktiveSpisok.data);
+                        c.set(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DATE), 8, 0, 0);
+                        c.add(Calendar.DATE, (int) -toDataAlarm);
+                        setAlarm(context, c, reaktiveSpisok.id * 100, true);
+                        break;
+                    case 0:
+                        if (realtime > time) {
+                            if (c.get(Calendar.DAY_OF_WEEK) == Calendar.FRIDAY)
+                                c.add(Calendar.DATE, 3);
+                            else
+                                c.add(Calendar.DATE, 1);
+                        }
+                        setAlarm(context, c, reaktiveSpisok.id * 100, true);
+                        break;
+                }
+            }
+        }
     }
 
     private void checkAlarm(Context context) {
@@ -112,7 +185,7 @@ public class ReceiverSetAlarm extends BroadcastReceiver {
                     c.set(Integer.parseInt(t1[0]), Integer.parseInt(t1[1]) - 1, Integer.parseInt(t1[2]), 8, 0, 0);
                     long timeset = c.getTimeInMillis();
                     long timeres = timeset - time;
-                    if (timeres > -toDataAlarm * 24L * 60L * 60L * 1000L && timeres < timer) {
+                    if (timeres > -timer && timeres < timer) {
                         c.setTimeInMillis(time);
                         if (realtime > time) {
                             if (c.get(Calendar.DAY_OF_WEEK) == Calendar.FRIDAY)
@@ -120,7 +193,7 @@ public class ReceiverSetAlarm extends BroadcastReceiver {
                             else
                                 c.add(Calendar.DATE, 1);
                         }
-                        setAlarm(context, c, data01);
+                        setAlarm(context, c, data01, false);
                     } else if (timeres > timer) {
                         GregorianCalendar calendar = new GregorianCalendar();
                         String data09 = inventarny_spisok_datum.data09;
@@ -135,12 +208,12 @@ public class ReceiverSetAlarm extends BroadcastReceiver {
                                 long t3l = calendar.getTimeInMillis();
                                 if (t2l < t3l) {
                                     c.add(Calendar.DATE, (int) -toDataAlarm);
-                                    setAlarm(context, c, data01);
+                                    setAlarm(context, c, data01, false);
                                 }
                             }
                         } else {
                             c.add(Calendar.DATE, (int) -toDataAlarm);
-                            setAlarm(context, c, data01);
+                            setAlarm(context, c, data01, false);
                         }
                     }
                 }
@@ -154,18 +227,22 @@ public class ReceiverSetAlarm extends BroadcastReceiver {
         alarmManager.cancel(pIntent);
     }
 
-    private void setAlarm(Context context, GregorianCalendar c, int requestCode) {
+    private void setAlarm(Context context, GregorianCalendar c, int requestCode, boolean reaktive) {
         boolean testAlarm = true;
-        String testDataLocal = c.get(Calendar.YEAR) + "-" + c.get(Calendar.MONTH) + "-" + c.get(Calendar.DATE);
-        for (int i = 0; i < testData.size(); i++) {
-            if (testData.get(i).contains(testDataLocal)) {
-                testAlarm = false;
-                break;
+        if (!reaktive) {
+            String testDataLocal = c.get(Calendar.YEAR) + "-" + c.get(Calendar.MONTH) + "-" + c.get(Calendar.DATE);
+            for (int i = 0; i < testData.size(); i++) {
+                if (testData.get(i).contains(testDataLocal)) {
+                    testAlarm = false;
+                    break;
+                }
             }
         }
         if (testAlarm) {
             AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-            PendingIntent pIntent = PendingIntent.getBroadcast(context, requestCode, new Intent(context, ReceiverNotification.class), 0);
+            Intent intent = new Intent(context, ReceiverNotification.class);
+            intent.putExtra("reaktive", reaktive);
+            PendingIntent pIntent = PendingIntent.getBroadcast(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pIntent);
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {

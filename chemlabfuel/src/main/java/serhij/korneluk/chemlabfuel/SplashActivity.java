@@ -14,6 +14,7 @@ public class SplashActivity extends AppCompatActivity {
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         if (getIntent().getExtras() != null) {
             intent.putExtra("notifications", getIntent().getExtras().getBoolean("notifications", false));
+            intent.putExtra("reaktive", getIntent().getExtras().getBoolean("reaktive", false));
         }
         startActivity(intent);
         finish();

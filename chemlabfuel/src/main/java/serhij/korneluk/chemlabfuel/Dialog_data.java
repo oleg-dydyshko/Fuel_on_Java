@@ -75,18 +75,35 @@ public class Dialog_data extends DialogFragment {
             c.add(Calendar.YEAR, 1);
             calendarView.setDate(c.getTimeInMillis());
         }));
+        int textview = getArguments().getInt("textview");
         calendarView.setOnDateChangeListener((view1, year, month, dayOfMonth) -> {
-            listiner.set_data(getArguments().getInt("textview"), year, month, dayOfMonth);
+            listiner.set_data(textview, year, month, dayOfMonth);
             getDialog().cancel();
         });
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setView(view);
-        builder.setPositiveButton("Отмена", (dialog, which) -> dialog.cancel());
-        builder.setNeutralButton("Удалить дату", (dialog, which) -> listiner.set_data(getArguments().getInt("textview"), 0, 0, 0));
+
+        if (textview == 7 || textview == 9 || textview == 10) {
+            builder.setNeutralButton("Удалить дату", (dialog, which) -> listiner.set_data(getArguments().getInt("textview"), 0, 0, 0));
+            builder.setPositiveButton("Отмена", (dialog, which) -> dialog.cancel());
+        }
+        if (textview == 3 || textview == 1) {
+            builder.setPositiveButton("Отмена", (dialog, which) -> dialog.cancel());
+        }
+        if (textview == 8) {
+            builder.setNegativeButton("Отмена", (dialog, which) -> dialog.cancel());
+            builder.setPositiveButton("Установить месяц", (dialog, which) -> {
+                GregorianCalendar c = new GregorianCalendar();
+                c.setTimeInMillis(calendarView.getDate());
+                listiner.set_data(textview, c.get(Calendar.YEAR), c.get(Calendar.MONTH), -1);
+            });
+        }
         AlertDialog alert = builder.create();
         alert.setOnShowListener(dialog -> {
             Button btnPositive = alert.getButton(Dialog.BUTTON_POSITIVE);
             btnPositive.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+            Button btnNegative = alert.getButton(Dialog.BUTTON_NEGATIVE);
+            btnNegative.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
             Button btnNeutral = alert.getButton(Dialog.BUTTON_NEUTRAL);
             btnNeutral.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
         });

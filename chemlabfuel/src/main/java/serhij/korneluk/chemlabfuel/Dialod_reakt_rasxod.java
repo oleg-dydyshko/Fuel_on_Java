@@ -2,6 +2,8 @@ package serhij.korneluk.chemlabfuel;
 
 import android.app.Dialog;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -26,16 +28,20 @@ public class Dialod_reakt_rasxod extends DialogFragment {
 
     private int groupPosition = 0;
     private int childposition = 0;
+    private int izmerenie = 0;
     private TextView textView1e;
-    private TextView textView2e;
+    private EditText textView2e;
     private EditText textView3e;
+    private EditText textView4e;
     private GregorianCalendar c;
+    private String[] ed_izmerenia = {"килограммах", "миллиграммах", "литрах", "миллилитрах"};
 
-    static Dialod_reakt_rasxod getInstance(int groupPosition, int childposition) {
+    static Dialod_reakt_rasxod getInstance(int groupPosition, int childposition, int izmerenie) {
         Dialod_reakt_rasxod opisanie = new Dialod_reakt_rasxod();
         Bundle bundle = new Bundle();
         bundle.putInt("groupposition", groupPosition);
         bundle.putInt("childposition", childposition);
+        bundle.putInt("izmerenie", izmerenie);
         opisanie.setArguments(bundle);
         return opisanie;
     }
@@ -46,13 +52,17 @@ public class Dialod_reakt_rasxod extends DialogFragment {
         if (getArguments() != null) {
             groupPosition = getArguments().getInt("groupposition", 1);
             childposition = getArguments().getInt("childposition", 1);
+            izmerenie = getArguments().getInt("izmerenie", 0);
         }
         View view = getActivity().getLayoutInflater().inflate(R.layout.dialog_reakt_rasxod, null);
         TextView editTextTitle = view.findViewById(R.id.textViewTitle);
         textView1e = view.findViewById(R.id.textView1e);
+        TextView kolkast = view.findViewById(R.id.kolkast);
+        kolkast.setText(kolkast.getText().toString() + " в " + ed_izmerenia[izmerenie]);
         c = (GregorianCalendar) Calendar.getInstance();
         set_data(1, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DATE));
-        textView1e.setOnClickListener((v -> {
+        Button button1 = view.findViewById(R.id.button1);
+        button1.setOnClickListener((v -> {
             String[] t1 = textView1e.getText().toString().split("-");
             c = new GregorianCalendar(Integer.parseInt(t1[0]), Integer.parseInt(t1[1]) - 1, Integer.parseInt(t1[2]));
             TextView textView1 = view.findViewById(R.id.textView1);
@@ -69,6 +79,8 @@ public class Dialod_reakt_rasxod extends DialogFragment {
             return false;
         });
         textView2e = view.findViewById(R.id.textView2e);
+        textView2e.addTextChangedListener(new MyTextWatcher(textView2e));
+        textView4e = view.findViewById(R.id.textView4e);
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setPositiveButton(getString(R.string.save), (dialog, which) -> {
             send();
@@ -86,14 +98,18 @@ public class Dialod_reakt_rasxod extends DialogFragment {
     }
 
     private void send() {
+        String plotnost = "";
+        if (!textView4e.getText().toString().equals("")) {
+            plotnost = " Плотность:" + textView4e.getText().toString();
+        }
         if (!textView2e.getText().toString().trim().equals("") && !textView3e.getText().toString().equals("")) {
             String gurnal = CremLabFuel.ReaktiveSpisok.get(groupPosition).get(childposition).get(16);
             if (!gurnal.equals(""))
                 gurnal = gurnal + "\n";
-            gurnal = gurnal + textView1e.getText().toString() + " " + new BigDecimal(textView2e.getText().toString().trim()) + " " + textView3e.getText().toString() + "\n";
+            gurnal = gurnal + textView1e.getText().toString() + " " + new BigDecimal(textView2e.getText().toString().trim().replace(",", ".")).toString().replace(".", ",") + ed_izmerenia[izmerenie] + plotnost + " " + textView3e.getText().toString() + "\n";
             String nomerProdukta = String.valueOf(groupPosition);
             String nomerPartii = String.valueOf(childposition);
-            BigDecimal ras = new BigDecimal(textView2e.getText().toString().trim());
+            BigDecimal ras = new BigDecimal(textView2e.getText().toString().trim().replace(",", "."));
             BigDecimal rasxod = new BigDecimal(CremLabFuel.ReaktiveSpisok.get(groupPosition).get(childposition).get(9)).subtract(ras);
             DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
             mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data09").setValue(rasxod.doubleValue());
@@ -125,6 +141,35 @@ public class Dialod_reakt_rasxod extends DialogFragment {
                 textView1e.setText("");
             else
                 textView1e.setText(getString(R.string.set_date, year, zero, month + 1, zero2, dayOfMonth));
+        }
+    }
+
+    private class MyTextWatcher implements TextWatcher {
+
+        private int editPosition;
+        private EditText textView;
+
+        MyTextWatcher(EditText textView) {
+            this.textView = textView;
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            editPosition = start + count;
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            String edit = s.toString();
+            edit = edit.replace(".", ",");
+            textView.removeTextChangedListener(this);
+            textView.setText(edit);
+            textView.setSelection(editPosition);
+            textView.addTextChangedListener(this);
         }
     }
 }

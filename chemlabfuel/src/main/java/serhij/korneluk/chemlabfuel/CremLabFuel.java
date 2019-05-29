@@ -69,6 +69,9 @@ public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItem
     public static LinkedHashMap<Integer, LinkedHashMap<Integer, LinkedHashMap<Integer, String>>> ReaktiveSpisok = new LinkedHashMap<>();
     private ArrayList<ReaktiveSpisok> spisokGroup = new ArrayList<>();
     private ArrayList<ArrayList<String>> spisokChild = new ArrayList<>();
+    private TabHost tabHost;
+    private ExpandableListView listView2;
+    private String[] ed_izmerenia = {"кг.", "мг.", "л.", "мл."};
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -85,11 +88,11 @@ public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItem
         listView.setOnItemLongClickListener(this);
 
         arrayAdapter2 = new ListAdapterReakt();
-        ExpandableListView listView2 = findViewById(R.id.listView2);
+        listView2 = findViewById(R.id.listView2);
         listView2.setAdapter(arrayAdapter2);
         listView2.setOnChildClickListener(this);
 
-        TabHost tabHost = findViewById(R.id.tabhost);
+        tabHost = findViewById(R.id.tabhost);
         tabHost.setup();
         TabHost.TabSpec tabSpec;
         tabSpec = tabHost.newTabSpec("tag1");
@@ -186,11 +189,8 @@ public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItem
     private ArrayList<String> seash(int groupPosition, int childPosition) {
         ReaktiveSpisok GroupR = spisokGroup.get(groupPosition);
         String Group = GroupR.string;
-        int t1 = spisokChild.get(groupPosition).get(childPosition).indexOf(": ");
-        String Child = spisokChild.get(groupPosition).get(childPosition).substring(t1 + 2);
-        int t2 = Child.indexOf(" <");
-        if (t2 != -1)
-            Child = Child.substring(0, t2);
+        int t1 = spisokChild.get(groupPosition).get(childPosition).indexOf(".");
+        String Child = spisokChild.get(groupPosition).get(childPosition).substring(0, t1);
         ArrayList<String> arrayList = new ArrayList<>();
         boolean end = false;
         for (Map.Entry<Integer, LinkedHashMap<Integer, LinkedHashMap<Integer, String>>> entry : CremLabFuel.ReaktiveSpisok.entrySet()) {
@@ -232,6 +232,8 @@ public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItem
                     if (entry3.getKey() == 15)
                         arrayList.add(entry3.getValue());
                     if (entry3.getKey() == 16)
+                        arrayList.add(entry3.getValue());
+                    if (entry3.getKey() == 17)
                         arrayList.add(entry3.getValue());
                 }
                 if (Group.contains(arrayList.get(13)) && Child.contains(arrayList.get(15))) {
@@ -287,14 +289,15 @@ public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItem
                 "<strong>Поставщик</strong><br>" + arrayList.get(2) + "<br><br>" +
                 "<strong>Притензии</strong><br>" + arrayList.get(3) + "<br><br>" +
                 "<strong>Квалификация</strong><br>" + arrayList.get(4) + "<br><br>" +
+                "<strong>Партия</strong><br>" + arrayList.get(17) + "<br><br>" +
                 "<strong>Дата изготовления</strong><br>" + arrayList.get(5) + "<br><br>" +
                 "<strong>Срок хранения</strong><br>" + arrayList.get(6) + "<br><br>" +
                 "<strong>Условия хранения</strong><br>" + arrayList.get(7) + "<br><br>" +
                 "<strong>Единица измерения</strong><br>" + izmerenie[Integer.parseInt(arrayList.get(8))] + "<br><br>" +
-                "<strong>Количество на остатке</strong><br>" + arrayList.get(9) + "<br><br>" +
-                "<strong>Минимальное количество</strong><br>" + arrayList.get(10) + "<br><br>" +
+                "<strong>Количество на остатке</strong><br>" + arrayList.get(9).replace(".", ",") + "<br><br>" +
+                "<strong>Минимальное количество</strong><br>" + arrayList.get(10).replace(".", ",") + "<br><br>" +
                 "<strong>Ответственный</strong><br>" + fnG + " " + lnG + "<br><br>" +
-                "<strong>Изменено</strong><br>" + editedString +
+                "<strong>Изменено</strong><br>" + editedString + "<br><br>" +
                 "<strong>Журнал расхода</strong><br>" + arrayList.get(16).replace("\n", "<br>");
         Dialod_opisanie opisanie = Dialod_opisanie.getInstance(data02, builder);
         opisanie.show(getSupportFragmentManager(), "opisanie");
@@ -342,7 +345,7 @@ public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItem
             mDatabase.child("equipments").child(InventorySpisok.get(position).uid).removeValue();
         } else {
             ArrayList<String> arrayList = seash(groupPosition, position);
-            if (ReaktiveSpisok.get(Integer.parseInt(arrayList.get(17))).size() == 1)
+            if (ReaktiveSpisok.get(Integer.parseInt(arrayList.get(18))).size() == 1)
                 mDatabase.child("reagents").child(arrayList.get(14)).removeValue();
             else
                 mDatabase.child("reagents").child(arrayList.get(14)).child(arrayList.get(15)).removeValue();
@@ -415,7 +418,7 @@ public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItem
         }
         if (id == R.id.add_reakt) {
             if (isNetworkAvailable()) {
-                edit_reakt = Dialod_opisanie_edit_reakt.getInstance(userEdit, "", "0");
+                edit_reakt = Dialod_opisanie_edit_reakt.getInstance(userEdit, "", "", 0);
                 edit_reakt.show(getSupportFragmentManager(), "edit");
                 edit = null;
                 rasxod = null;
@@ -487,6 +490,7 @@ public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItem
             mDatabase.child("equipments").addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    InventorySpisok.clear();
                     for (DataSnapshot data : dataSnapshot.getChildren()) {
                         if (data.getValue() instanceof HashMap) {
                             HashMap hashMap = (HashMap) data.getValue();
@@ -533,7 +537,8 @@ public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItem
                         ArrayList<String> partia = new ArrayList<>();
                         GregorianCalendar g = (GregorianCalendar) Calendar.getInstance();
                         long srokToDay = g.getTimeInMillis();
-                        long data06 = 0;
+                        long data05b = 0;
+                        int data08 = 0;
                         for (DataSnapshot data2 : data.getChildren()) {
                             String srok = "";
                             int i = 0;
@@ -550,6 +555,9 @@ public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItem
                                     Object data11 = data2.child("data11").getValue();
                                     if (data11 == null)
                                         data11 = "";
+                                    Object data12 = data2.child("data12").getValue();
+                                    if (data12 == null)
+                                        data12 = "";
                                     spisoks.put(i, (String) data2.child("createdBy").getValue());//0
                                     i++;
                                     spisoks.put(i, (String) data2.child("data01").getValue());//1
@@ -583,12 +591,17 @@ public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItem
                                     spisoks.put(i, data2.getKey());//15
                                     i++;
                                     spisoks.put(i, (String) data11);//16
+                                    i++;
+                                    spisoks.put(i, String.valueOf(data12));//17
                                     spisokN.put(Integer.parseInt(data2.getKey()), spisoks);
 
                                     String data05 = (String) data2.child("data05").getValue();
                                     String[] d = data05.split("-");
-                                    g.set(Integer.parseInt(d[0]), Integer.parseInt(d[1]) - 1, Integer.parseInt(d[2]));
-                                    data06 = g.getTimeInMillis();
+                                    if (d.length == 3)
+                                        g.set(Integer.parseInt(d[0]), Integer.parseInt(d[1]) - 1, Integer.parseInt(d[2]));
+                                    else
+                                        g.set(Integer.parseInt(d[0]), Integer.parseInt(d[1]) - 1, 1);
+                                    data05b = g.getTimeInMillis();
                                     g.add(Calendar.MONTH, (int) (long) data2.child("data06").getValue());
                                     BigDecimal ostatok;
                                     if (data2.child("data09").getValue() instanceof Double)
@@ -607,19 +620,28 @@ public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItem
                                         minostatok = BigDecimal.valueOf((double) data2.child("data10").getValue());
                                     else
                                         minostatok = BigDecimal.valueOf((double) (long) data2.child("data10").getValue());
-                                    partia.add("Партия: " + data2.getKey() + srok);
+                                    data08 = (int) (long) data2.child("data08").getValue();
+                                    partia.add(data2.getKey() + "." + srok + " <!---->Остаток: " + ostatok.toString().replace(".", ",") + " " + ed_izmerenia[data08]);
                                 }
                             }
                         }
-                        spisokGroup.add(new ReaktiveSpisok(data06, Integer.parseInt(id), name, ostatokSum, minostatok));
+                        spisokGroup.add(new ReaktiveSpisok(data05b, Integer.parseInt(id), name, ostatokSum, minostatok, data08));
                         spisokChild.add(partia);
                         ReaktiveSpisok.put(Integer.parseInt(id), spisokN);
+                    }
+                    if (getIntent().getExtras() != null) {
+                        if (getIntent().getExtras().getBoolean("reaktive", false)) {
+                            tabHost.setCurrentTabByTag("tag2");
+                            for ( int i = 0; i < arrayAdapter2.getGroupCount(); i++ ) {
+                                listView2.expandGroup(i);
+                            }
+                        }
                     }
                     Collections.sort(spisokGroup, new ReaktiveSpisokSort(CremLabFuel.this));
                     arrayAdapter2.notifyDataSetChanged();
                     progressBar.setVisibility(View.GONE);
 
-                    //sendBroadcast(new Intent(CremLabFuel.this, ReceiverSetAlarm.class));
+                    sendBroadcast(new Intent(CremLabFuel.this, ReceiverSetAlarm.class));
                 }
 
                 @Override
@@ -852,10 +874,12 @@ public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItem
                 group = (ViewHolderGroup) convertView.getTag();
             }
             group.text.setTextSize(fuel.getInt("fontsize", 18));
-            String ostatok = " (Остаток: " + spisokGroup.get(groupPosition).ostatok + ")";
+            String ostatok = " (Остаток: " + spisokGroup.get(groupPosition).ostatok.toString().replace(".", ",") + " " + ed_izmerenia[spisokGroup.get(groupPosition).ed_izmerenia] + ")";
             int compare = spisokGroup.get(groupPosition).ostatok.compareTo(spisokGroup.get(groupPosition).minostatok);
-            if (compare <= 0)
-                ostatok = " (<font color=#9a2828>Остаток: " + spisokGroup.get(groupPosition).ostatok + "</font>)";
+            if (spisokGroup.get(groupPosition).ostatok.equals(BigDecimal.ZERO))
+                ostatok = " <font color=#9a2828>Срок истёк</font>";
+            else if (compare <= 0)
+                ostatok = " (<font color=#9a2828>Остаток: " + spisokGroup.get(groupPosition).ostatok.toString().replace(".", ",") + " " + ed_izmerenia[spisokGroup.get(groupPosition).ed_izmerenia] +  "</font>)";
             group.text.setText(Html.fromHtml(spisokGroup.get(groupPosition).id + ". " + spisokGroup.get(groupPosition).string + ostatok));
             return convertView;
         }
@@ -893,7 +917,7 @@ public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItem
             popup.setOnMenuItemClickListener(menuItem -> {
                 popup.dismiss();
                 if (menuItem.getItemId() == R.id.menu_add) {
-                    edit_reakt = Dialod_opisanie_edit_reakt.getInstance(userEdit, spisokGroup.get(groupPosition).string, spisokGroup.get(groupPosition).minostatok.toString());
+                    edit_reakt = Dialod_opisanie_edit_reakt.getInstance(userEdit, spisokGroup.get(groupPosition).string, spisokGroup.get(groupPosition).minostatok.toString(), spisokGroup.get(groupPosition).ed_izmerenia);
                     edit_reakt.show(getSupportFragmentManager(), "edit");
                     edit = null;
                     rasxod = null;
@@ -901,7 +925,7 @@ public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItem
                 }
                 if (menuItem.getItemId() == R.id.menu_minus) {
                     ArrayList<String> arrayList = seash(groupPosition, childposition);
-                    rasxod = Dialod_reakt_rasxod.getInstance(Integer.parseInt(arrayList.get(14)), Integer.parseInt(arrayList.get(15)));
+                    rasxod = Dialod_reakt_rasxod.getInstance(Integer.parseInt(arrayList.get(14)), Integer.parseInt(arrayList.get(15)), Integer.parseInt(arrayList.get(8)));
                     rasxod.show(getSupportFragmentManager(), "rasxod");
                     edit = null;
                     edit_reakt = null;

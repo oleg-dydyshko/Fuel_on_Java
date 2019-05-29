@@ -5,6 +5,8 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,6 +36,7 @@ import java.util.Map;
 public class Dialod_opisanie_edit_reakt extends DialogFragment {
 
     private static boolean add;
+    private TextView editTextTitle;
     private EditText editText2;
     private TextView editText3;
     private EditText editText5;
@@ -45,10 +48,14 @@ public class Dialod_opisanie_edit_reakt extends DialogFragment {
     private EditText editText12;
     private Spinner spinner11e;
     private EditText editText13;
+    private EditText editText14;
+    private EditText editText15;
+    private Spinner spinner9;
     private String user = "";
     private String title = "";
     private int groupPosition = 0;
     private int childposition = 0;
+    private int ed_izmerenia = 0;
     private String[] data = {"Килограмм", "Миллиграмм", "Литры", "Миллилитры"};
     private listUpdateListiner listiner;
 
@@ -63,12 +70,13 @@ public class Dialod_opisanie_edit_reakt extends DialogFragment {
         return opisanie;
     }
 
-    static Dialod_opisanie_edit_reakt getInstance(String user, String title, String minostatok) {
+    static Dialod_opisanie_edit_reakt getInstance(String user, String title, String minostatok, int ed_izmerenia) {
         Dialod_opisanie_edit_reakt opisanie = new Dialod_opisanie_edit_reakt();
         Bundle bundle = new Bundle();
         bundle.putString("user", user);
         bundle.putString("title", title);
         bundle.putString("minostatok", minostatok);
+        bundle.putInt("ed_izmerenia", ed_izmerenia);
         opisanie.setArguments(bundle);
         add = true;
         return opisanie;
@@ -106,7 +114,10 @@ public class Dialod_opisanie_edit_reakt extends DialogFragment {
                 if (year == 0)
                     editText8.setText("");
                 else
-                    editText8.setText(getString(R.string.set_date, year, zero, month + 1, zero2, dayOfMonth));
+                    if (dayOfMonth == -1)
+                        editText8.setText(getString(R.string.set_date2, year, zero, month + 1));
+                    else
+                        editText8.setText(getString(R.string.set_date, year, zero, month + 1, zero2, dayOfMonth));
                 break;
         }
     }
@@ -114,11 +125,13 @@ public class Dialod_opisanie_edit_reakt extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        String[] god = {"Год", "Месяц"};
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         View view = getActivity().getLayoutInflater().inflate(R.layout.dialog_opisanie_edit_reakt, null);
-        TextView editTextTitle = view.findViewById(R.id.textViewTitle);
+        editTextTitle = view.findViewById(R.id.textViewTitle);
 
         editText2 = view.findViewById(R.id.textView2e);
+        editText2.addTextChangedListener(new MyTextWatcher(editText2));
         editText3 = view.findViewById(R.id.textView3e);
         editText5 = view.findViewById(R.id.textView5e);
         editText6 = view.findViewById(R.id.textView6e);
@@ -127,8 +140,9 @@ public class Dialod_opisanie_edit_reakt extends DialogFragment {
         editText9 = view.findViewById(R.id.textView9e);
         editText10 = view.findViewById(R.id.textView10e);
         spinner11e = view.findViewById(R.id.spinner11e);
-        ArrayAdapter<String> adapter = new ListAdapter(getActivity());
-        spinner11e.setAdapter(adapter);
+        spinner9 = view.findViewById(R.id.spinner9);
+        spinner9.setAdapter(new ListAdapter(getActivity(), god));
+        spinner11e.setAdapter(new ListAdapter(getActivity(), data));
         spinner11e.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -139,15 +153,13 @@ public class Dialod_opisanie_edit_reakt extends DialogFragment {
             }
         });
         editText12 = view.findViewById(R.id.textView12e);
+        editText12.addTextChangedListener(new MyTextWatcher(editText12));
         editText13 = view.findViewById(R.id.textView13e);
-        editText13.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_GO) {
-                send();
-                return true;
-            }
-            return false;
-        });
-        editText3.setOnClickListener((v -> {
+        editText13.addTextChangedListener(new MyTextWatcher(editText13));
+        editText15 = view.findViewById(R.id.textView15e);
+        editText14 = view.findViewById(R.id.textView14e);
+        Button button3 = view.findViewById(R.id.button3);
+        button3.setOnClickListener((v -> {
             GregorianCalendar c;
             if (editText3.getText().toString().equals("")) {
                 c = (GregorianCalendar) Calendar.getInstance();
@@ -159,13 +171,17 @@ public class Dialod_opisanie_edit_reakt extends DialogFragment {
             Dialog_data data = Dialog_data.getInstance(c.getTimeInMillis(), 3, textView3.getText().toString());
             data.show(getFragmentManager(), "data");
         }));
-        editText8.setOnClickListener((v -> {
+        Button button8 = view.findViewById(R.id.button8);
+        button8.setOnClickListener((v -> {
             GregorianCalendar c;
             if (editText8.getText().toString().equals("")) {
                 c = (GregorianCalendar) Calendar.getInstance();
             } else {
                 String[] t1 = editText8.getText().toString().split("-");
-                c = new GregorianCalendar(Integer.parseInt(t1[0]), Integer.parseInt(t1[1]) - 1, Integer.parseInt(t1[2]));
+                if (t1.length == 3)
+                    c = new GregorianCalendar(Integer.parseInt(t1[0]), Integer.parseInt(t1[1]) - 1, Integer.parseInt(t1[2]));
+                else
+                    c = new GregorianCalendar(Integer.parseInt(t1[0]), Integer.parseInt(t1[1]) - 1, 1);
             }
             TextView textView8 = view.findViewById(R.id.textView8);
             Dialog_data data = Dialog_data.getInstance(c.getTimeInMillis(), 8, textView8.getText().toString());
@@ -177,13 +193,27 @@ public class Dialod_opisanie_edit_reakt extends DialogFragment {
             title = getArguments().getString("title", "");
             groupPosition = getArguments().getInt("groupposition", 1);
             childposition = getArguments().getInt("childposition", 1);
-            minostatok = getArguments().getString("minostatok", "0");
+            minostatok = getArguments().getString("minostatok", "");
+            ed_izmerenia = getArguments().getInt("ed_izmerenia", 0);
         }
         if (add) {
             editTextTitle.setText(R.string.add);
             editText2.setText(title);
             editText13.setText(minostatok);
+            editText13.setImeOptions(EditorInfo.IME_ACTION_GO);
+            editText13.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_GO) {
+                send();
+                return true;
+            }
+            return false;
+        });
+            spinner11e.setSelection(ed_izmerenia);
+            TextView textView15 = view.findViewById(R.id.textView15);
+            textView15.setVisibility(View.GONE);
+            editText15.setVisibility(View.GONE);
         } else {
+            spinner9.setVisibility(View.GONE);
             editTextTitle.setText(CremLabFuel.ReaktiveSpisok.get(groupPosition).get(childposition).get(13));
             editText2.setText(CremLabFuel.ReaktiveSpisok.get(groupPosition).get(childposition).get(13));
             editText3.setText(CremLabFuel.ReaktiveSpisok.get(groupPosition).get(childposition).get(1));
@@ -196,6 +226,8 @@ public class Dialod_opisanie_edit_reakt extends DialogFragment {
             spinner11e.setSelection(Integer.parseInt(CremLabFuel.ReaktiveSpisok.get(groupPosition).get(childposition).get(8)));
             editText12.setText(String.valueOf(CremLabFuel.ReaktiveSpisok.get(groupPosition).get(childposition).get(9)));
             editText13.setText(String.valueOf(CremLabFuel.ReaktiveSpisok.get(groupPosition).get(childposition).get(10)));
+            editText14.setText(String.valueOf(CremLabFuel.ReaktiveSpisok.get(groupPosition).get(childposition).get(17)));
+            editText15.setText(String.valueOf(CremLabFuel.ReaktiveSpisok.get(groupPosition).get(childposition).get(16)));
         }
 
         editText2.setSelection(editText2.getText().length());
@@ -206,6 +238,7 @@ public class Dialod_opisanie_edit_reakt extends DialogFragment {
         editText10.setSelection(editText10.getText().length());
         editText12.setSelection(editText12.getText().length());
         editText13.setSelection(editText13.getText().length());
+        editText14.setSelection(editText14.getText().length());
         // Показываем клавиатуру
         //InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         //imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
@@ -226,8 +259,11 @@ public class Dialod_opisanie_edit_reakt extends DialogFragment {
     }
 
     private void send() {
+        if (editText6.getText().toString().trim().equals("")) {
+            editText6.setText(R.string.no);
+        }
         if (editText9.getText().toString().trim().equals("")) {
-            editText9.setText("12");
+            editText9.setText("1");
         }
         if (editText10.getText().toString().trim().equals("")) {
             editText10.setText(R.string.obychnye);
@@ -239,7 +275,10 @@ public class Dialod_opisanie_edit_reakt extends DialogFragment {
 
             String nomerProdukta = String.valueOf(groupPosition);
             String nomerPartii = String.valueOf(childposition);
-
+            long text9 = Long.valueOf(editText9.getText().toString().trim());
+            if (add && spinner9.getSelectedItemPosition() == 0) {
+                text9 = text9 * 12;
+            }
             if (add) {
                 if (CremLabFuel.ReaktiveSpisok.size() != 0) {
                     for (Map.Entry<Integer, LinkedHashMap<Integer, LinkedHashMap<Integer, String>>> entry : CremLabFuel.ReaktiveSpisok.entrySet()) {
@@ -271,7 +310,6 @@ public class Dialod_opisanie_edit_reakt extends DialogFragment {
 
                     }
                 }
-                //uid = mDatabase.child("reagents").push().getKey();
                 mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("createdAt").setValue(g.getTimeInMillis());
                 mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("createdBy").setValue(user);
             }
@@ -281,11 +319,13 @@ public class Dialod_opisanie_edit_reakt extends DialogFragment {
             mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data03").setValue(editText6.getText().toString().trim());
             mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data04").setValue(editText7.getText().toString().trim());
             mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data05").setValue(editText8.getText().toString().trim());
-            mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data06").setValue(Long.valueOf(editText9.getText().toString().trim()));
+            mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data06").setValue(text9);
             mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data07").setValue(editText10.getText().toString().trim());
             mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data08").setValue((long) spinner11e.getSelectedItemPosition());
-            mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data09").setValue(Double.valueOf(editText12.getText().toString().trim()));
-            mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data10").setValue(Double.valueOf(editText13.getText().toString().trim()));
+            mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data09").setValue(Double.valueOf(editText12.getText().toString().trim().replace(",", ".")));
+            mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data10").setValue(Double.valueOf(editText13.getText().toString().trim().replace(",", ".")));
+            mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data11").setValue(editText15.getText().toString().trim());
+            mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data12").setValue(editText14.getText().toString().trim());
             if (!add) {
                 mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("editedAt").setValue(g.getTimeInMillis());
                 mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("editedBy").setValue(user);
@@ -309,10 +349,46 @@ public class Dialod_opisanie_edit_reakt extends DialogFragment {
         getDialog().cancel();
     }
 
+    private class MyTextWatcher implements TextWatcher {
+
+        private int editPosition;
+        private EditText textView;
+
+        MyTextWatcher(EditText textView) {
+            this.textView = textView;
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            editPosition = start + count;
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            String edit = s.toString();
+            if (textView.getId() == R.id.textView2e && !edit.equals("")) {
+                editTextTitle.setText(edit);
+            } else {
+                edit = edit.replace(".", ",");
+                textView.removeTextChangedListener(this);
+                textView.setText(edit);
+                textView.setSelection(editPosition);
+                textView.addTextChangedListener(this);
+            }
+        }
+    }
+
     private class ListAdapter extends ArrayAdapter<String> {
 
-        ListAdapter(Context context) {
+        private String[] dataA;
+
+        ListAdapter(Context context, String[] data) {
             super(context, R.layout.simple_list_item2, data);
+            dataA = data;
         }
 
         @NonNull
@@ -328,7 +404,7 @@ public class Dialod_opisanie_edit_reakt extends DialogFragment {
             } else {
                 viewHolder = (ViewHolder) mView.getTag();
             }
-            viewHolder.text.setText(data[position]);
+            viewHolder.text.setText(dataA[position]);
             return mView;
         }
     }

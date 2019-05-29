@@ -31,7 +31,7 @@ public class SettingsActivity extends AppCompatActivity {
         int fontsize = fuel.getInt("fontsize", 18);
         int notifi = fuel.getInt("notification", 0);
         setContentView(R.layout.settings_activity);
-        Spinner spinner = findViewById(R.id.spinner);
+        Spinner spinner = findViewById(R.id.spinner9);
         ArrayAdapter<String> adapter = new ListAdapter(this);
         spinner.setAdapter(adapter);
         spinner.setSelection(notifi);
