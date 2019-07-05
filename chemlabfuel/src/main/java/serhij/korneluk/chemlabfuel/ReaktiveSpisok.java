@@ -1,6 +1,7 @@
 package serhij.korneluk.chemlabfuel;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 
 class ReaktiveSpisok {
 
@@ -11,8 +12,9 @@ class ReaktiveSpisok {
     final BigDecimal minostatok;
     final int ed_izmerenia;
     final int check;
+    final ArrayList<String> arrayList;
 
-    ReaktiveSpisok(long data, int id, String string, BigDecimal ostatok, BigDecimal minostatok, int ed_izmerenia) {
+    ReaktiveSpisok(long data, int id, String string, BigDecimal ostatok, BigDecimal minostatok, int ed_izmerenia, ArrayList<String> arrayList) {
         this.data = data;
         this.id = id;
         this.string = string;
@@ -20,6 +22,7 @@ class ReaktiveSpisok {
         this.minostatok = minostatok;
         this.ed_izmerenia = ed_izmerenia;
         this.check = 1;
+        this.arrayList = arrayList;
     }
 
     ReaktiveSpisok(long data, int id, int check) {
@@ -30,5 +33,6 @@ class ReaktiveSpisok {
         this.minostatok = null;
         this.ed_izmerenia = 0;
         this.check = check;
+        this.arrayList = null;
     }
 }

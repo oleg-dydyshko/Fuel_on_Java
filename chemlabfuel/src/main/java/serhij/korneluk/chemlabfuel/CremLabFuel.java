@@ -61,14 +61,13 @@ public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItem
     private ArrayList<ArrayList<String>> users = new ArrayList<>();
     private Dialod_opisanie_edit edit;
     private Dialod_opisanie_edit_reakt edit_reakt;
-    Dialod_reakt_rasxod rasxod;
+    private Dialod_reakt_rasxod rasxod;
     private String userEdit;
     private ProgressBar progressBar;
     private FirebaseAuth mAuth;
     public static ArrayList<InventorySpisok> InventorySpisok = new ArrayList<>();
     public static LinkedHashMap<Integer, LinkedHashMap<Integer, LinkedHashMap<Integer, String>>> ReaktiveSpisok = new LinkedHashMap<>();
     private ArrayList<ReaktiveSpisok> spisokGroup = new ArrayList<>();
-    private ArrayList<ArrayList<String>> spisokChild = new ArrayList<>();
     private TabHost tabHost;
     private ExpandableListView listView2;
     private String[] ed_izmerenia = {"кг.", "мг.", "л.", "мл."};
@@ -187,10 +186,9 @@ public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItem
     }
 
     private ArrayList<String> seash(int groupPosition, int childPosition) {
-        ReaktiveSpisok GroupR = spisokGroup.get(groupPosition);
-        String Group = GroupR.string;
-        int t1 = spisokChild.get(groupPosition).get(childPosition).indexOf(".");
-        String Child = spisokChild.get(groupPosition).get(childPosition).substring(0, t1);
+        String Group = spisokGroup.get(groupPosition).string;
+        int t1 = spisokGroup.get(groupPosition).arrayList.get(childPosition).indexOf(".");
+        String Child = spisokGroup.get(groupPosition).arrayList.get(childPosition).substring(0, t1);
         ArrayList<String> arrayList = new ArrayList<>();
         boolean end = false;
         for (Map.Entry<Integer, LinkedHashMap<Integer, LinkedHashMap<Integer, String>>> entry : CremLabFuel.ReaktiveSpisok.entrySet()) {
@@ -525,7 +523,6 @@ public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItem
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     ReaktiveSpisok.clear();
                     spisokGroup.clear();
-                    spisokChild.clear();
                     for (DataSnapshot data : dataSnapshot.getChildren()) {
                         String name = (String) data.child("name").getValue();
                         if (name == null)
@@ -534,7 +531,7 @@ public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItem
                         BigDecimal ostatokSum = BigDecimal.ZERO;
                         BigDecimal minostatok = BigDecimal.ZERO;
                         LinkedHashMap<Integer, LinkedHashMap<Integer, String>> spisokN = new LinkedHashMap<>();
-                        ArrayList<String> partia = new ArrayList<>();
+                        ArrayList<String> spisokChild = new ArrayList<>();
                         GregorianCalendar g = (GregorianCalendar) Calendar.getInstance();
                         long srokToDay = g.getTimeInMillis();
                         long data05b = 0;
@@ -621,12 +618,11 @@ public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItem
                                     else
                                         minostatok = BigDecimal.valueOf((double) (long) data2.child("data10").getValue());
                                     data08 = (int) (long) data2.child("data08").getValue();
-                                    partia.add(data2.getKey() + "." + srok + " <!---->Остаток: " + ostatok.toString().replace(".", ",") + " " + ed_izmerenia[data08]);
+                                    spisokChild.add(data2.getKey() + "." + srok + " <!---->Остаток: " + ostatok.toString().replace(".", ",") + " " + ed_izmerenia[data08]);
                                 }
                             }
                         }
-                        spisokGroup.add(new ReaktiveSpisok(data05b, Integer.parseInt(id), name, ostatokSum, minostatok, data08));
-                        spisokChild.add(partia);
+                        spisokGroup.add(new ReaktiveSpisok(data05b, Integer.parseInt(id), name, ostatokSum, minostatok, data08, spisokChild));
                         ReaktiveSpisok.put(Integer.parseInt(id), spisokN);
                     }
                     if (getIntent().getExtras() != null) {
@@ -828,7 +824,7 @@ public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItem
 
         @Override
         public int getChildrenCount(int groupPosition) {
-            return spisokChild.get(groupPosition).size();
+            return spisokGroup.get(groupPosition).arrayList.size();
         }
 
         @Override
@@ -838,7 +834,7 @@ public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItem
 
         @Override
         public Object getChild(int groupPosition, int childPosition) {
-            return spisokChild.get(groupPosition).get(childPosition);
+            return spisokGroup.get(groupPosition).arrayList.get(childPosition);
         }
 
         @Override
@@ -898,7 +894,7 @@ public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItem
                 viewHolder = (ViewHolder) convertView.getTag();
             }
             viewHolder.button_popup.setOnClickListener((v -> showPopupMenu(viewHolder.button_popup, groupPosition, childPosition)));
-            viewHolder.text.setText(Html.fromHtml(spisokChild.get(groupPosition).get(childPosition)));
+            viewHolder.text.setText(Html.fromHtml(spisokGroup.get(groupPosition).arrayList.get(childPosition)));
             viewHolder.text.setTextSize(fuel.getInt("fontsize", 18));
             return convertView;
         }
@@ -939,7 +935,7 @@ public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItem
                     return true;
                 }
                 if (menuItem.getItemId() == R.id.menu_remove) {
-                    String spisokGroupSt = spisokChild.get(groupPosition).get(childposition);
+                    String spisokGroupSt = spisokGroup.get(groupPosition).arrayList.get(childposition);
                     int t1 = spisokGroupSt.indexOf(" <");
                     if (t1 != -1)
                         spisokGroupSt = spisokGroupSt.substring(0, t1);

@@ -16,10 +16,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -113,11 +111,10 @@ public class Dialod_opisanie_edit_reakt extends DialogFragment {
             case 8:
                 if (year == 0)
                     editText8.setText("");
+                else if (dayOfMonth == -1)
+                    editText8.setText(getString(R.string.set_date2, year, zero, month + 1));
                 else
-                    if (dayOfMonth == -1)
-                        editText8.setText(getString(R.string.set_date2, year, zero, month + 1));
-                    else
-                        editText8.setText(getString(R.string.set_date, year, zero, month + 1, zero2, dayOfMonth));
+                    editText8.setText(getString(R.string.set_date, year, zero, month + 1, zero2, dayOfMonth));
                 break;
         }
     }
@@ -202,12 +199,12 @@ public class Dialod_opisanie_edit_reakt extends DialogFragment {
             editText13.setText(minostatok);
             editText13.setImeOptions(EditorInfo.IME_ACTION_GO);
             editText13.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_GO) {
-                send();
-                return true;
-            }
-            return false;
-        });
+                if (actionId == EditorInfo.IME_ACTION_GO) {
+                    send();
+                    return true;
+                }
+                return false;
+            });
             spinner11e.setSelection(ed_izmerenia);
             TextView textView15 = view.findViewById(R.id.textView15);
             textView15.setVisibility(View.GONE);
@@ -262,90 +259,87 @@ public class Dialod_opisanie_edit_reakt extends DialogFragment {
         if (editText6.getText().toString().trim().equals("")) {
             editText6.setText(R.string.no);
         }
+        if (editText8.getText().toString().trim().equals("")) {
+            Calendar calendar = Calendar.getInstance();
+            int month = calendar.get(Calendar.MONTH) + 1;
+            String zero = "";
+            if (month < 10) zero = "0";
+            editText8.setText(calendar.get(Calendar.YEAR) + "-" + zero + month);
+        }
         if (editText9.getText().toString().trim().equals("")) {
             editText9.setText("1");
         }
         if (editText10.getText().toString().trim().equals("")) {
             editText10.setText(R.string.obychnye);
         }
-        if (!editText12.getText().toString().trim().equals("") && !editText12.getText().toString().trim().equals("") && !editText8.getText().toString().trim().equals("")) {
+        if (editText12.getText().toString().trim().equals("")) {
+            editText12.setText("0");
+        }
+        if (editText13.getText().toString().trim().equals("")) {
+            editText13.setText("0");
+        }
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+        GregorianCalendar g = (GregorianCalendar) Calendar.getInstance();
 
-            DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-            GregorianCalendar g = (GregorianCalendar) Calendar.getInstance();
-
-            String nomerProdukta = String.valueOf(groupPosition);
-            String nomerPartii = String.valueOf(childposition);
-            long text9 = Long.valueOf(editText9.getText().toString().trim());
-            if (add && spinner9.getSelectedItemPosition() == 0) {
-                text9 = text9 * 12;
-            }
-            if (add) {
-                if (CremLabFuel.ReaktiveSpisok.size() != 0) {
-                    for (Map.Entry<Integer, LinkedHashMap<Integer, LinkedHashMap<Integer, String>>> entry : CremLabFuel.ReaktiveSpisok.entrySet()) {
-                        LinkedHashMap<Integer, LinkedHashMap<Integer, String>> value = entry.getValue();
-                        for (Map.Entry<Integer, LinkedHashMap<Integer, String>> entry2 : value.entrySet()) {
-                            LinkedHashMap<Integer, String> value2 = entry2.getValue();
-                            String name = "no";
-                            for (Map.Entry<Integer, String> entry3 : value2.entrySet()) {
-                                if (entry3.getKey() == 13) {
-                                    name = entry3.getValue();
+        String nomerProdukta = String.valueOf(groupPosition);
+        String nomerPartii = String.valueOf(childposition);
+        long text9 = Long.valueOf(editText9.getText().toString().trim());
+        if (add && spinner9.getSelectedItemPosition() == 0) {
+            text9 = text9 * 12;
+        }
+        if (add) {
+            if (CremLabFuel.ReaktiveSpisok.size() != 0) {
+                for (Map.Entry<Integer, LinkedHashMap<Integer, LinkedHashMap<Integer, String>>> entry : CremLabFuel.ReaktiveSpisok.entrySet()) {
+                    LinkedHashMap<Integer, LinkedHashMap<Integer, String>> value = entry.getValue();
+                    for (Map.Entry<Integer, LinkedHashMap<Integer, String>> entry2 : value.entrySet()) {
+                        LinkedHashMap<Integer, String> value2 = entry2.getValue();
+                        String name = "no";
+                        for (Map.Entry<Integer, String> entry3 : value2.entrySet()) {
+                            if (entry3.getKey() == 13) {
+                                name = entry3.getValue();
+                            }
+                            if (entry3.getKey() == 14) {
+                                if (title.equals("")) {
+                                    groupPosition = Integer.parseInt(entry3.getValue()) + 1;
+                                    nomerProdukta = String.valueOf(groupPosition);
+                                } else if (editText2.getText().toString().trim().contains(name)) {
+                                    groupPosition = Integer.parseInt(entry3.getValue());
+                                    nomerProdukta = String.valueOf(groupPosition);
                                 }
-                                if (entry3.getKey() == 14) {
-                                    if (title.equals("")) {
-                                        groupPosition = Integer.parseInt(entry3.getValue()) + 1;
-                                        nomerProdukta = String.valueOf(groupPosition);
-                                    } else if (editText2.getText().toString().trim().contains(name)) {
-                                        groupPosition = Integer.parseInt(entry3.getValue());
-                                        nomerProdukta = String.valueOf(groupPosition);
-                                    }
-                                }
-                                if (entry3.getKey() == 15) {
-                                    if (editText2.getText().toString().trim().contains(name)) {
-                                        childposition = Integer.parseInt(entry3.getValue()) + 1;
-                                        nomerPartii = String.valueOf(childposition);
-                                    }
+                            }
+                            if (entry3.getKey() == 15) {
+                                if (editText2.getText().toString().trim().contains(name)) {
+                                    childposition = Integer.parseInt(entry3.getValue()) + 1;
+                                    nomerPartii = String.valueOf(childposition);
                                 }
                             }
                         }
-
                     }
+
                 }
-                mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("createdAt").setValue(g.getTimeInMillis());
-                mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("createdBy").setValue(user);
             }
-            mDatabase.child("reagents").child(nomerProdukta).child("name").setValue(editText2.getText().toString().trim());
-            mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data01").setValue(editText3.getText().toString().trim());
-            mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data02").setValue(editText5.getText().toString().trim());
-            mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data03").setValue(editText6.getText().toString().trim());
-            mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data04").setValue(editText7.getText().toString().trim());
-            mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data05").setValue(editText8.getText().toString().trim());
-            mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data06").setValue(text9);
-            mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data07").setValue(editText10.getText().toString().trim());
-            mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data08").setValue((long) spinner11e.getSelectedItemPosition());
-            mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data09").setValue(Double.valueOf(editText12.getText().toString().trim().replace(",", ".")));
-            mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data10").setValue(Double.valueOf(editText13.getText().toString().trim().replace(",", ".")));
-            mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data11").setValue(editText15.getText().toString().trim());
-            mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data12").setValue(editText14.getText().toString().trim());
-            if (!add) {
-                mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("editedAt").setValue(g.getTimeInMillis());
-                mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("editedBy").setValue(user);
-            }
-            getActivity().sendBroadcast(new Intent(getActivity(), ReceiverSetAlarm.class));
-            listiner.UpdateList();
-        } else {
-            LinearLayout layout = new LinearLayout(getActivity());
-            layout.setBackgroundResource(R.color.colorPrimary);
-            TextView toast = new TextView(getActivity());
-            toast.setTextColor(getResources().getColor(R.color.colorIcons));
-            toast.setPadding(10, 10, 10, 10);
-            toast.setText(R.string.error);
-            toast.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
-            layout.addView(toast);
-            Toast mes = new Toast(getActivity());
-            mes.setDuration(Toast.LENGTH_LONG);
-            mes.setView(layout);
-            mes.show();
+            mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("createdAt").setValue(g.getTimeInMillis());
+            mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("createdBy").setValue(user);
         }
+        mDatabase.child("reagents").child(nomerProdukta).child("name").setValue(editText2.getText().toString().trim());
+        mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data01").setValue(editText3.getText().toString().trim());
+        mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data02").setValue(editText5.getText().toString().trim());
+        mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data03").setValue(editText6.getText().toString().trim());
+        mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data04").setValue(editText7.getText().toString().trim());
+        mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data05").setValue(editText8.getText().toString().trim());
+        mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data06").setValue(text9);
+        mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data07").setValue(editText10.getText().toString().trim());
+        mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data08").setValue((long) spinner11e.getSelectedItemPosition());
+        mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data09").setValue(Double.valueOf(editText12.getText().toString().trim().replace(",", ".")));
+        mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data10").setValue(Double.valueOf(editText13.getText().toString().trim().replace(",", ".")));
+        mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data11").setValue(editText15.getText().toString().trim());
+        mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data12").setValue(editText14.getText().toString().trim());
+        if (!add) {
+            mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("editedAt").setValue(g.getTimeInMillis());
+            mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("editedBy").setValue(user);
+        }
+        getActivity().sendBroadcast(new Intent(getActivity(), ReceiverSetAlarm.class));
+        listiner.UpdateList();
         getDialog().cancel();
     }
 
