@@ -7,6 +7,9 @@
         android:id="@+id/menu_minus"
         android:title="@string/spisanie" />
     <item
+        android:id="@+id/menu_jurnal"
+        android:title="@string/gurnal_rasxoda" />
+    <item
         android:id="@+id/menu_redoktor"
         android:title="@string/edit" />
     <item

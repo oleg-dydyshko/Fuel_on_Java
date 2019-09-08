@@ -53,15 +53,16 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener, Dialog_context_menu.Dialog_context_menu_Listener, Dialog_delite_confirm.Dialog_delite_confirm_listiner, Dialog_data.Dialog_data_listiner, Dialod_opisanie_edit_reakt.listUpdateListiner, ExpandableListView.OnChildClickListener {
+public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener, Dialog_context_menu.Dialog_context_menu_Listener, Dialog_delite_confirm.Dialog_delite_confirm_listiner, Dialog_data.Dialog_data_listiner, Dialod_opisanie_edit_reakt.listUpdateListiner, ExpandableListView.OnChildClickListener, Dialod_reakt_rasxod.updateJurnal, Dialog_context_menu_reakt.Dialog_context_menu_reakt_Listener {
 
     private ArrayList<String> inventarny_spisok = new ArrayList<>();
     private ArrayAdapter<String> arrayAdapter;
     private ListAdapterReakt arrayAdapter2;
-    private ArrayList<ArrayList<String>> users = new ArrayList<>();
+    public static ArrayList<ArrayList<String>> users = new ArrayList<>();
     private Dialod_opisanie_edit edit;
     private Dialod_opisanie_edit_reakt edit_reakt;
     private Dialod_reakt_rasxod rasxod;
+    private Dialog_jurnal jurnal;
     private String userEdit;
     private ProgressBar progressBar;
     private FirebaseAuth mAuth;
@@ -71,6 +72,55 @@ public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItem
     private TabHost tabHost;
     private ExpandableListView listView2;
     private String[] ed_izmerenia = {"кг.", "мг.", "л.", "мл."};
+
+    @Override
+    public void onDialogAddPartia(int groupPosition) {
+        edit_reakt = Dialod_opisanie_edit_reakt.getInstance(userEdit, spisokGroup.get(groupPosition).string, spisokGroup.get(groupPosition).minostatok.toString(), spisokGroup.get(groupPosition).ed_izmerenia);
+        edit_reakt.show(getSupportFragmentManager(), "edit");
+        edit = null;
+        rasxod = null;
+        jurnal = null;
+    }
+
+    @Override
+    public void onDialogRashod(int groupPosition, int childPosition) {
+        ArrayList<String> arrayList = seash(groupPosition, childPosition);
+        rasxod = Dialod_reakt_rasxod.getInstance(Integer.parseInt(arrayList.get(14)), Integer.parseInt(arrayList.get(15)), Integer.parseInt(arrayList.get(8)), userEdit);
+        rasxod.show(getSupportFragmentManager(), "rasxod");
+        edit = null;
+        edit_reakt = null;
+        jurnal = null;
+    }
+
+    @Override
+    public void onDialogJurnal(int groupPosition, int childPosition) {
+        ArrayList<String> arrayList = seash(groupPosition, childPosition);
+        jurnal = Dialog_jurnal.getInstance(Integer.parseInt(arrayList.get(14)), Integer.parseInt(arrayList.get(15)), Integer.parseInt(arrayList.get(8)), arrayList.get(16), userEdit);
+        jurnal.show(getSupportFragmentManager(), "jurnal");
+        edit = null;
+        edit_reakt = null;
+        rasxod = null;
+    }
+
+    @Override
+    public void onDialogEdit(int groupPosition, int childPosition) {
+        ArrayList<String> arrayList = seash(groupPosition, childPosition);
+        edit_reakt = Dialod_opisanie_edit_reakt.getInstance(userEdit, Integer.parseInt(arrayList.get(14)), Integer.parseInt(arrayList.get(15)));
+        edit_reakt.show(getSupportFragmentManager(), "edit");
+        edit = null;
+        rasxod = null;
+        jurnal = null;
+    }
+
+    @Override
+    public void onDialogRemove(int groupPosition, int childPosition) {
+        String spisokGroupSt = spisokGroup.get(groupPosition).arrayList.get(childPosition);
+        int t1 = spisokGroupSt.indexOf(" <");
+        if (t1 != -1)
+            spisokGroupSt = spisokGroupSt.substring(0, t1);
+        Dialog_delite_confirm confirm = Dialog_delite_confirm.getInstance(spisokGroup.get(groupPosition).string + " " + spisokGroupSt, groupPosition, childPosition);
+        confirm.show(getSupportFragmentManager(), "confirm");
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -90,6 +140,19 @@ public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItem
         listView2 = findViewById(R.id.listView2);
         listView2.setAdapter(arrayAdapter2);
         listView2.setOnChildClickListener(this);
+        listView2.setOnItemLongClickListener((adapterView, view, i, l) -> {
+            long packedPosition = listView2.getExpandableListPosition(i);
+            int itemType = ExpandableListView.getPackedPositionType(packedPosition);
+            int groupPosition = ExpandableListView.getPackedPositionGroup(packedPosition);
+            int childPosition = ExpandableListView.getPackedPositionChild(packedPosition);
+            if (itemType == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
+                ArrayList<String> arrayList = seash(groupPosition, childPosition);
+                Dialog_context_menu_reakt reakt = Dialog_context_menu_reakt.getInstance(groupPosition, childPosition, CremLabFuel.ReaktiveSpisok.get(Integer.parseInt(arrayList.get(14))).get(Integer.parseInt(arrayList.get(15))).get(13));
+                reakt.show(getSupportFragmentManager(), "reakt");
+                return true;
+            }
+            return false;
+        });
 
         tabHost = findViewById(R.id.tabhost);
         tabHost.setup();
@@ -295,8 +358,7 @@ public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItem
                 "<strong>Количество на остатке</strong><br>" + arrayList.get(9).replace(".", ",") + "<br><br>" +
                 "<strong>Минимальное количество</strong><br>" + arrayList.get(10).replace(".", ",") + "<br><br>" +
                 "<strong>Ответственный</strong><br>" + fnG + " " + lnG + "<br><br>" +
-                "<strong>Изменено</strong><br>" + editedString + "<br><br>" +
-                "<strong>Журнал расхода</strong><br>" + arrayList.get(16).replace("\n", "<br>");
+                "<strong>Изменено</strong><br>" + editedString;
         Dialod_opisanie opisanie = Dialod_opisanie.getInstance(data02, builder);
         opisanie.show(getSupportFragmentManager(), "opisanie");
         return false;
@@ -312,6 +374,12 @@ public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItem
     @Override
     public void UpdateList() {
         arrayAdapter2.notifyDataSetChanged();
+    }
+
+    @Override
+    public void updateJurnalRasxoda(int position, String t0, String t1, String t2, String t3, String t4, String t5) {
+        if (jurnal != null)
+            jurnal.updateJurnalRasxoda(position, t0, t1, t2, t3, t4, t5);
     }
 
     @Override
@@ -523,6 +591,7 @@ public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItem
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     ReaktiveSpisok.clear();
                     spisokGroup.clear();
+                    Gson gson = new Gson();
                     for (DataSnapshot data : dataSnapshot.getChildren()) {
                         String name = (String) data.child("name").getValue();
                         if (name == null)
@@ -551,7 +620,7 @@ public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItem
                                         editedBy = "";
                                     Object data11 = data2.child("data11").getValue();
                                     if (data11 == null)
-                                        data11 = "";
+                                        data11 = new ArrayList<>();
                                     Object data12 = data2.child("data12").getValue();
                                     if (data12 == null)
                                         data12 = "";
@@ -587,7 +656,7 @@ public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItem
                                     i++;
                                     spisoks.put(i, data2.getKey());//15
                                     i++;
-                                    spisoks.put(i, (String) data11);//16
+                                    spisoks.put(i, gson.toJson(data11));//16
                                     i++;
                                     spisoks.put(i, String.valueOf(data12));//17
                                     spisokN.put(Integer.parseInt(data2.getKey()), spisoks);
@@ -628,7 +697,7 @@ public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItem
                     if (getIntent().getExtras() != null) {
                         if (getIntent().getExtras().getBoolean("reaktive", false)) {
                             tabHost.setCurrentTabByTag("tag2");
-                            for ( int i = 0; i < arrayAdapter2.getGroupCount(); i++ ) {
+                            for (int i = 0; i < arrayAdapter2.getGroupCount(); i++) {
                                 listView2.expandGroup(i);
                             }
                         }
@@ -875,7 +944,7 @@ public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItem
             if (spisokGroup.get(groupPosition).ostatok.equals(BigDecimal.ZERO))
                 ostatok = " <font color=#9a2828>Срок истёк</font>";
             else if (compare <= 0)
-                ostatok = " (<font color=#9a2828>Остаток: " + spisokGroup.get(groupPosition).ostatok.toString().replace(".", ",") + " " + ed_izmerenia[spisokGroup.get(groupPosition).ed_izmerenia] +  "</font>)";
+                ostatok = " (<font color=#9a2828>Остаток: " + spisokGroup.get(groupPosition).ostatok.toString().replace(".", ",") + " " + ed_izmerenia[spisokGroup.get(groupPosition).ed_izmerenia] + "</font>)";
             group.text.setText(Html.fromHtml(spisokGroup.get(groupPosition).id + ". " + spisokGroup.get(groupPosition).string + ostatok));
             return convertView;
         }
@@ -917,14 +986,24 @@ public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItem
                     edit_reakt.show(getSupportFragmentManager(), "edit");
                     edit = null;
                     rasxod = null;
+                    jurnal = null;
                     return true;
                 }
                 if (menuItem.getItemId() == R.id.menu_minus) {
                     ArrayList<String> arrayList = seash(groupPosition, childposition);
-                    rasxod = Dialod_reakt_rasxod.getInstance(Integer.parseInt(arrayList.get(14)), Integer.parseInt(arrayList.get(15)), Integer.parseInt(arrayList.get(8)));
+                    rasxod = Dialod_reakt_rasxod.getInstance(Integer.parseInt(arrayList.get(14)), Integer.parseInt(arrayList.get(15)), Integer.parseInt(arrayList.get(8)), userEdit);
                     rasxod.show(getSupportFragmentManager(), "rasxod");
                     edit = null;
                     edit_reakt = null;
+                    jurnal = null;
+                }
+                if (menuItem.getItemId() == R.id.menu_jurnal) {
+                    ArrayList<String> arrayList = seash(groupPosition, childposition);
+                    jurnal = Dialog_jurnal.getInstance(Integer.parseInt(arrayList.get(14)), Integer.parseInt(arrayList.get(15)), Integer.parseInt(arrayList.get(8)), arrayList.get(16), userEdit);
+                    jurnal.show(getSupportFragmentManager(), "jurnal");
+                    edit = null;
+                    edit_reakt = null;
+                    rasxod = null;
                 }
                 if (menuItem.getItemId() == R.id.menu_redoktor) {
                     ArrayList<String> arrayList = seash(groupPosition, childposition);
@@ -932,6 +1011,7 @@ public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItem
                     edit_reakt.show(getSupportFragmentManager(), "edit");
                     edit = null;
                     rasxod = null;
+                    jurnal = null;
                     return true;
                 }
                 if (menuItem.getItemId() == R.id.menu_remove) {

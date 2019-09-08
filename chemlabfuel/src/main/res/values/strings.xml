@@ -42,7 +42,7 @@
     <string name="input_data">Дата получения</string>
     <string name="pritenzii">Претензии</string>
     <string name="kvalifikacia">Квалификация</string>
-    <string name="data_izgotovlinia">Дата изготовления</string>
+    <string name="data_izgotovlinia">Дата изготовления(YYYY-MM-DD)</string>
     <string name="srok_xranetia">Срок хранения</string>
     <string name="uslovie_xran">Условия хранения</string>
     <string name="izmerenie">Единица измерения</string>
@@ -58,5 +58,6 @@
     <string name="plotnost">Плотность</string>
     <string name="gurnal_rasxoda">Журнал расхода</string>
     <string name="no_data">Нет даты</string>
+    <string name="kol_na_ost">Количество на остатке</string>
     <!--%1$s is a string and %2$d is a decimal number-->
 </resources>

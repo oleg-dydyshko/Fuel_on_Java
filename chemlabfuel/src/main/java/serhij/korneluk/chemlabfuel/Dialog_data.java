@@ -87,17 +87,17 @@ public class Dialog_data extends DialogFragment {
             builder.setNeutralButton("Удалить дату", (dialog, which) -> listiner.set_data(getArguments().getInt("textview"), 0, 0, 0));
             builder.setPositiveButton("Отмена", (dialog, which) -> dialog.cancel());
         }
-        if (textview == 3 || textview == 1) {
+        if (textview == 3 || textview == 1 || textview == 8) {
             builder.setPositiveButton("Отмена", (dialog, which) -> dialog.cancel());
         }
-        if (textview == 8) {
+        /*if (textview == 8) {
             builder.setNegativeButton("Отмена", (dialog, which) -> dialog.cancel());
             builder.setPositiveButton("Установить месяц", (dialog, which) -> {
                 GregorianCalendar c = new GregorianCalendar();
                 c.setTimeInMillis(calendarView.getDate());
                 listiner.set_data(textview, c.get(Calendar.YEAR), c.get(Calendar.MONTH), -1);
             });
-        }
+        }*/
         AlertDialog alert = builder.create();
         alert.setOnShowListener(dialog -> {
             Button btnPositive = alert.getButton(Dialog.BUTTON_POSITIVE);

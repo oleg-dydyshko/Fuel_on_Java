@@ -40,14 +40,13 @@ public class Dialod_opisanie_edit_reakt extends DialogFragment {
     private EditText editText5;
     private EditText editText6;
     private EditText editText7;
-    private TextView editText8;
+    private EditText editText8;
     private EditText editText9;
     private EditText editText10;
     private EditText editText12;
     private Spinner spinner11e;
     private EditText editText13;
     private EditText editText14;
-    private EditText editText15;
     private Spinner spinner9;
     private String user = "";
     private String title = "";
@@ -111,8 +110,8 @@ public class Dialod_opisanie_edit_reakt extends DialogFragment {
             case 8:
                 if (year == 0)
                     editText8.setText("");
-                else if (dayOfMonth == -1)
-                    editText8.setText(getString(R.string.set_date2, year, zero, month + 1));
+                    //else if (dayOfMonth == -1)
+                    //editText8.setText(getString(R.string.set_date2, year, zero, month + 1));
                 else
                     editText8.setText(getString(R.string.set_date, year, zero, month + 1, zero2, dayOfMonth));
                 break;
@@ -153,7 +152,6 @@ public class Dialod_opisanie_edit_reakt extends DialogFragment {
         editText12.addTextChangedListener(new MyTextWatcher(editText12));
         editText13 = view.findViewById(R.id.textView13e);
         editText13.addTextChangedListener(new MyTextWatcher(editText13));
-        editText15 = view.findViewById(R.id.textView15e);
         editText14 = view.findViewById(R.id.textView14e);
         Button button3 = view.findViewById(R.id.button3);
         button3.setOnClickListener((v -> {
@@ -206,10 +204,9 @@ public class Dialod_opisanie_edit_reakt extends DialogFragment {
                 return false;
             });
             spinner11e.setSelection(ed_izmerenia);
-            TextView textView15 = view.findViewById(R.id.textView15);
-            textView15.setVisibility(View.GONE);
-            editText15.setVisibility(View.GONE);
         } else {
+            TextView textView12 = view.findViewById(R.id.textView12);
+            textView12.setText(R.string.kol_na_ost);
             spinner9.setVisibility(View.GONE);
             editTextTitle.setText(CremLabFuel.ReaktiveSpisok.get(groupPosition).get(childposition).get(13));
             editText2.setText(CremLabFuel.ReaktiveSpisok.get(groupPosition).get(childposition).get(13));
@@ -224,7 +221,6 @@ public class Dialod_opisanie_edit_reakt extends DialogFragment {
             editText12.setText(String.valueOf(CremLabFuel.ReaktiveSpisok.get(groupPosition).get(childposition).get(9)));
             editText13.setText(String.valueOf(CremLabFuel.ReaktiveSpisok.get(groupPosition).get(childposition).get(10)));
             editText14.setText(String.valueOf(CremLabFuel.ReaktiveSpisok.get(groupPosition).get(childposition).get(17)));
-            editText15.setText(String.valueOf(CremLabFuel.ReaktiveSpisok.get(groupPosition).get(childposition).get(16)));
         }
 
         editText2.setSelection(editText2.getText().length());
@@ -241,9 +237,7 @@ public class Dialod_opisanie_edit_reakt extends DialogFragment {
         //imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
         builder.setView(view);
 
-        builder.setPositiveButton(getString(R.string.save), (dialog, which) -> {
-            send();
-        });
+        builder.setPositiveButton(getString(R.string.save), (dialog, which) -> send());
         builder.setNegativeButton(getString(R.string.cansel), (dialog, which) -> dialog.cancel());
         AlertDialog alert = builder.create();
         alert.setOnShowListener(dialog -> {
@@ -332,7 +326,6 @@ public class Dialod_opisanie_edit_reakt extends DialogFragment {
         mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data08").setValue((long) spinner11e.getSelectedItemPosition());
         mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data09").setValue(Double.valueOf(editText12.getText().toString().trim().replace(",", ".")));
         mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data10").setValue(Double.valueOf(editText13.getText().toString().trim().replace(",", ".")));
-        mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data11").setValue(editText15.getText().toString().trim());
         mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("data12").setValue(editText14.getText().toString().trim());
         if (!add) {
             mDatabase.child("reagents").child(nomerProdukta).child(nomerPartii).child("editedAt").setValue(g.getTimeInMillis());
