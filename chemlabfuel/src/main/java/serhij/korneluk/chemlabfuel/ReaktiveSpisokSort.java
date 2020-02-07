@@ -7,7 +7,7 @@ import java.util.Comparator;
 
 public class ReaktiveSpisokSort implements Comparator<ReaktiveSpisok> {
 
-    private SharedPreferences fuel;
+    private final SharedPreferences fuel;
 
     ReaktiveSpisokSort(Context context) {
         fuel = context.getSharedPreferences("fuel", Context.MODE_PRIVATE);

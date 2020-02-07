@@ -126,7 +126,6 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="center_vertical"
-                    android:hint="@string/no_data"
                     android:paddingBottom="10dp"
                     android:textColor="#FF000000"
                     android:textSize="18sp" />

@@ -53,7 +53,7 @@ public class Dialod_opisanie_edit_reakt extends DialogFragment {
     private int groupPosition = 0;
     private int childposition = 0;
     private int ed_izmerenia = 0;
-    private String[] data = {"Килограмм", "Миллиграмм", "Литры", "Миллилитры"};
+    private final String[] data = {"Килограмм", "Миллиграмм", "Литры", "Миллилитры"};
     private listUpdateListiner listiner;
 
     static Dialod_opisanie_edit_reakt getInstance(String user, int groupPosition, int childposition) {
@@ -339,7 +339,7 @@ public class Dialod_opisanie_edit_reakt extends DialogFragment {
     private class MyTextWatcher implements TextWatcher {
 
         private int editPosition;
-        private EditText textView;
+        private final EditText textView;
 
         MyTextWatcher(EditText textView) {
             this.textView = textView;
@@ -371,7 +371,7 @@ public class Dialod_opisanie_edit_reakt extends DialogFragment {
 
     private class ListAdapter extends ArrayAdapter<String> {
 
-        private String[] dataA;
+        private final String[] dataA;
 
         ListAdapter(Context context, String[] data) {
             super(context, R.layout.simple_list_item2, data);

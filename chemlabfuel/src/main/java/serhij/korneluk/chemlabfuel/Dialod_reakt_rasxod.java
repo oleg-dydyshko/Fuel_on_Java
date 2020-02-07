@@ -41,8 +41,8 @@ public class Dialod_reakt_rasxod extends DialogFragment {
     private EditText textView4e;
     private GregorianCalendar c;
     private String user = "";
-    private String[] ed_izmerenia = {"килограммах", "миллиграммах", "литрах", "миллилитрах"};
-    private String[] ed_izmerenia2 = {"килограмм(-а)", "миллиграмм(-а)", "литр(-а)", "миллилитр(-а)"};
+    private final String[] ed_izmerenia = {"килограммах", "миллиграммах", "литрах", "миллилитрах"};
+    private final String[] ed_izmerenia2 = {"килограмм(-а)", "миллиграмм(-а)", "литр(-а)", "миллилитр(-а)"};
     private String jurnal = "";
     private int position;
     private ArrayList<ArrayList<String>> jur;
@@ -180,7 +180,7 @@ public class Dialod_reakt_rasxod extends DialogFragment {
                 subJurnal.add(user);
                 jur.add(subJurnal);
             } else {
-                correkt = new BigDecimal(CremLabFuel.ReaktiveSpisok.get(groupPosition).get(childposition).get(9)).add(new BigDecimal(jur.get(position).get(1)));
+                correkt = new BigDecimal(CremLabFuel.ReaktiveSpisok.get(groupPosition).get(childposition).get(9)).add(new BigDecimal(jur.get(position).get(1).replace(",", ".")));
                 jur.get(position).set(0, textView1e.getText().toString());
                 jur.get(position).set(1, new BigDecimal(textView2e.getText().toString().trim().replace(",", ".")).toString().replace(".", ","));
                 jur.get(position).set(2, ed_izmerenia2[izmerenie]);
@@ -229,7 +229,7 @@ public class Dialod_reakt_rasxod extends DialogFragment {
     private class MyTextWatcher implements TextWatcher {
 
         private int editPosition;
-        private EditText textView;
+        private final EditText textView;
 
         MyTextWatcher(EditText textView) {
             this.textView = textView;

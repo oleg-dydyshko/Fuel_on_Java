@@ -26,8 +26,8 @@ import java.util.HashMap;
 
 public class ReceiverSetAlarm extends BroadcastReceiver {
 
-    private ArrayList<String> testData = new ArrayList<>();
-    private ArrayList<ReaktiveSpisok> reaktiveSpisok = new ArrayList<>();
+    private final ArrayList<String> testData = new ArrayList<>();
+    private final ArrayList<ReaktiveSpisok> reaktiveSpisok = new ArrayList<>();
     private long toDataAlarm = 45L;
 
     @Override

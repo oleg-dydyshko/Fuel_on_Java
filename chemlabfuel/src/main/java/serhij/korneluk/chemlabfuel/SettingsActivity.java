@@ -21,7 +21,7 @@ import androidx.appcompat.widget.Toolbar;
 
 public class SettingsActivity extends AppCompatActivity {
 
-    private String[] data = {"за 45 дней", "за 30 дней", "за 15 дней", "за 10 дней", "за 5 дней", "Никогда"};
+    private final String[] data = {"за 45 дней", "за 30 дней", "за 15 дней", "за 10 дней", "за 5 дней", "Никогда"};
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

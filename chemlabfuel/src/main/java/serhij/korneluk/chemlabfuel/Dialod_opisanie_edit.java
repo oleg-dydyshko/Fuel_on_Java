@@ -8,9 +8,7 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -111,6 +109,12 @@ public class Dialod_opisanie_edit extends DialogFragment {
         editText5 = view.findViewById(R.id.textView5e);
         editText6 = view.findViewById(R.id.textView6e);
         editText7 = view.findViewById(R.id.textView7e);
+        GregorianCalendar g = (GregorianCalendar) Calendar.getInstance();
+        String zero = "";
+        if (g.get(Calendar.DATE) < 10) zero = "0";
+        String zero2 = "";
+        if (g.get(Calendar.MONTH) < 9) zero2 = "0";
+        editText7.setHint(g.get(Calendar.YEAR) + "-" + zero2 + (g.get(Calendar.MONTH) + 1) + "-" + zero + g.get(Calendar.DATE));
         editText9 = view.findViewById(R.id.textView9e);
         editText10 = view.findViewById(R.id.textView10e);
         editText12 = view.findViewById(R.id.textView12e);
@@ -226,46 +230,39 @@ public class Dialod_opisanie_edit extends DialogFragment {
         data10_RazKonservacia = editText10.getText().toString().trim();
         data7_OldCheck = editText7.getText().toString().trim();
         data6_PeriodCheck = editText6.getText().toString().trim();
-        if (!data7_OldCheck.equals("") && data7_OldCheck.contains("-")) {
-            GregorianCalendar c = (GregorianCalendar) Calendar.getInstance();
-            c.add(Calendar.YEAR, 20);
-            long data11 = c.getTimeInMillis();
-            if (data6_PeriodCheck != null && !data6_PeriodCheck.equals("")) {
-                if (data9_Konservacia != null && !data9_Konservacia.equals("")) {
-                    String[] tk = data9_Konservacia.split("-");
-                    c.set(Integer.parseInt(tk[0]), (Integer.parseInt(tk[1]) - 1), Integer.parseInt(tk[2]));
-                    long start = c.getTimeInMillis();
-                    if (data10_RazKonservacia != null && !data10_RazKonservacia.equals("")) {
-                        String[] tr = data10_RazKonservacia.split("-");
-                        c.set(Integer.parseInt(tr[0]), (Integer.parseInt(tr[1]) - 1), Integer.parseInt(tr[2]));
-                        long end = c.getTimeInMillis();
-                        if (start > end) {
-                            c.setTimeInMillis(start);
-                            c.add(Calendar.YEAR, 20);
-                            data11 = c.getTimeInMillis();
-                            String zero = "";
-                            if (c.get(Calendar.DATE) < 10) zero = "0";
-                            String zero2 = "";
-                            if (c.get(Calendar.MONTH) < 9) zero2 = "0";
-                            String[] t1 = data7_OldCheck.split("-");
-                            c.set(Integer.parseInt(t1[0]), (Integer.parseInt(t1[1]) - 1), Integer.parseInt(t1[2]));
-                            c.add(Calendar.MONTH, Integer.parseInt(data6_PeriodCheck));
-                            data8 = c.get(Calendar.YEAR) + "-" + zero2 + (c.get(Calendar.MONTH) + 1) + "-" + zero + c.get(Calendar.DATE);
-                        } else {
-                            String[] t1 = data7_OldCheck.split("-");
-                            c.set(Integer.parseInt(t1[0]), (Integer.parseInt(t1[1]) - 1), Integer.parseInt(t1[2]));
-                            c.add(Calendar.MONTH, Integer.parseInt(data6_PeriodCheck));
-                            String zero = "";
-                            if (c.get(Calendar.DATE) < 10) zero = "0";
-                            String zero2 = "";
-                            if (c.get(Calendar.MONTH) < 9) zero2 = "0";
-                            data8 = c.get(Calendar.YEAR) + "-" + zero2 + (c.get(Calendar.MONTH) + 1) + "-" + zero + c.get(Calendar.DATE);
-                            data11 = c.getTimeInMillis();
-                        }
-                    } else {
+        if (!(!data7_OldCheck.equals("") && data7_OldCheck.contains("-"))) {
+            GregorianCalendar g = (GregorianCalendar) Calendar.getInstance();
+            String zero = "";
+            if (g.get(Calendar.DATE) < 10) zero = "0";
+            String zero2 = "";
+            if (g.get(Calendar.MONTH) < 9) zero2 = "0";
+            data7_OldCheck = g.get(Calendar.YEAR) + "-" + zero2 + (g.get(Calendar.MONTH) + 1) + "-" + zero + g.get(Calendar.DATE);
+        }
+        GregorianCalendar c = (GregorianCalendar) Calendar.getInstance();
+        c.add(Calendar.YEAR, 20);
+        long data11 = c.getTimeInMillis();
+        if (data6_PeriodCheck != null && !data6_PeriodCheck.equals("")) {
+            if (data9_Konservacia != null && !data9_Konservacia.equals("")) {
+                String[] tk = data9_Konservacia.split("-");
+                c.set(Integer.parseInt(tk[0]), (Integer.parseInt(tk[1]) - 1), Integer.parseInt(tk[2]));
+                long start = c.getTimeInMillis();
+                if (data10_RazKonservacia != null && !data10_RazKonservacia.equals("")) {
+                    String[] tr = data10_RazKonservacia.split("-");
+                    c.set(Integer.parseInt(tr[0]), (Integer.parseInt(tr[1]) - 1), Integer.parseInt(tr[2]));
+                    long end = c.getTimeInMillis();
+                    if (start > end) {
                         c.setTimeInMillis(start);
                         c.add(Calendar.YEAR, 20);
                         data11 = c.getTimeInMillis();
+                        String zero = "";
+                        if (c.get(Calendar.DATE) < 10) zero = "0";
+                        String zero2 = "";
+                        if (c.get(Calendar.MONTH) < 9) zero2 = "0";
+                        String[] t1 = data7_OldCheck.split("-");
+                        c.set(Integer.parseInt(t1[0]), (Integer.parseInt(t1[1]) - 1), Integer.parseInt(t1[2]));
+                        c.add(Calendar.MONTH, Integer.parseInt(data6_PeriodCheck));
+                        data8 = c.get(Calendar.YEAR) + "-" + zero2 + (c.get(Calendar.MONTH) + 1) + "-" + zero + c.get(Calendar.DATE);
+                    } else {
                         String[] t1 = data7_OldCheck.split("-");
                         c.set(Integer.parseInt(t1[0]), (Integer.parseInt(t1[1]) - 1), Integer.parseInt(t1[2]));
                         c.add(Calendar.MONTH, Integer.parseInt(data6_PeriodCheck));
@@ -274,8 +271,12 @@ public class Dialod_opisanie_edit extends DialogFragment {
                         String zero2 = "";
                         if (c.get(Calendar.MONTH) < 9) zero2 = "0";
                         data8 = c.get(Calendar.YEAR) + "-" + zero2 + (c.get(Calendar.MONTH) + 1) + "-" + zero + c.get(Calendar.DATE);
+                        data11 = c.getTimeInMillis();
                     }
                 } else {
+                    c.setTimeInMillis(start);
+                    c.add(Calendar.YEAR, 20);
+                    data11 = c.getTimeInMillis();
                     String[] t1 = data7_OldCheck.split("-");
                     c.set(Integer.parseInt(t1[0]), (Integer.parseInt(t1[1]) - 1), Integer.parseInt(t1[2]));
                     c.add(Calendar.MONTH, Integer.parseInt(data6_PeriodCheck));
@@ -284,48 +285,44 @@ public class Dialod_opisanie_edit extends DialogFragment {
                     String zero2 = "";
                     if (c.get(Calendar.MONTH) < 9) zero2 = "0";
                     data8 = c.get(Calendar.YEAR) + "-" + zero2 + (c.get(Calendar.MONTH) + 1) + "-" + zero + c.get(Calendar.DATE);
-                    data11 = c.getTimeInMillis();
                 }
+            } else {
+                String[] t1 = data7_OldCheck.split("-");
+                c.set(Integer.parseInt(t1[0]), (Integer.parseInt(t1[1]) - 1), Integer.parseInt(t1[2]));
+                c.add(Calendar.MONTH, Integer.parseInt(data6_PeriodCheck));
+                String zero = "";
+                if (c.get(Calendar.DATE) < 10) zero = "0";
+                String zero2 = "";
+                if (c.get(Calendar.MONTH) < 9) zero2 = "0";
+                data8 = c.get(Calendar.YEAR) + "-" + zero2 + (c.get(Calendar.MONTH) + 1) + "-" + zero + c.get(Calendar.DATE);
+                data11 = c.getTimeInMillis();
             }
-
-            DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-            GregorianCalendar g = (GregorianCalendar) Calendar.getInstance();
-            if (add) {
-                uid = mDatabase.child("equipments").push().getKey();
-                mDatabase.child("equipments").child(uid).child("createdAt").setValue(g.getTimeInMillis());
-                mDatabase.child("equipments").child(uid).child("createdBy").setValue(user);
-                mDatabase.child("equipments").child(uid).child("data01").setValue(size + 1);
-            }
-            mDatabase.child("equipments").child(uid).child("data02").setValue(editText2.getText().toString().trim());
-            mDatabase.child("equipments").child(uid).child("data03").setValue(editText3.getText().toString().trim());
-            mDatabase.child("equipments").child(uid).child("data04").setValue(editText4.getText().toString().trim());
-            mDatabase.child("equipments").child(uid).child("data05").setValue(editText5.getText().toString().trim());
-            mDatabase.child("equipments").child(uid).child("data06").setValue(data6_PeriodCheck);
-            mDatabase.child("equipments").child(uid).child("data07").setValue(data7_OldCheck);
-            mDatabase.child("equipments").child(uid).child("data08").setValue(data8);
-            mDatabase.child("equipments").child(uid).child("data09").setValue(data9_Konservacia);
-            mDatabase.child("equipments").child(uid).child("data10").setValue(data10_RazKonservacia);
-            mDatabase.child("equipments").child(uid).child("data11").setValue(data11);
-            mDatabase.child("equipments").child(uid).child("data12").setValue(editText12.getText().toString().trim());
-            if (!add) {
-                mDatabase.child("equipments").child(uid).child("editedAt").setValue(g.getTimeInMillis());
-                mDatabase.child("equipments").child(uid).child("editedBy").setValue(user);
-            }
-            getActivity().sendBroadcast(new Intent(getActivity(), ReceiverSetAlarm.class));
-        } else {
-            LinearLayout layout = new LinearLayout(getActivity());
-            layout.setBackgroundResource(R.color.colorPrimary);
-            TextView toast = new TextView(getActivity());
-            toast.setTextColor(getResources().getColor(R.color.colorIcons));
-            toast.setPadding(10, 10, 10, 10);
-            toast.setText(R.string.error);
-            toast.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
-            layout.addView(toast);
-            Toast mes = new Toast(getActivity());
-            mes.setDuration(Toast.LENGTH_LONG);
-            mes.setView(layout);
-            mes.show();
         }
+
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+        GregorianCalendar g = (GregorianCalendar) Calendar.getInstance();
+        if (add) {
+            uid = mDatabase.child("equipments").push().getKey();
+            mDatabase.child("equipments").child(uid).child("createdAt").setValue(g.getTimeInMillis());
+            mDatabase.child("equipments").child(uid).child("createdBy").setValue(user);
+            mDatabase.child("equipments").child(uid).child("data01").setValue(size + 1);
+        }
+        mDatabase.child("equipments").child(uid).child("data02").setValue(editText2.getText().toString().trim());
+        mDatabase.child("equipments").child(uid).child("data03").setValue(editText3.getText().toString().trim());
+        mDatabase.child("equipments").child(uid).child("data04").setValue(editText4.getText().toString().trim());
+        mDatabase.child("equipments").child(uid).child("data05").setValue(editText5.getText().toString().trim());
+        mDatabase.child("equipments").child(uid).child("data06").setValue(data6_PeriodCheck);
+        mDatabase.child("equipments").child(uid).child("data07").setValue(data7_OldCheck);
+        mDatabase.child("equipments").child(uid).child("data08").setValue(data8);
+        mDatabase.child("equipments").child(uid).child("data09").setValue(data9_Konservacia);
+        mDatabase.child("equipments").child(uid).child("data10").setValue(data10_RazKonservacia);
+        mDatabase.child("equipments").child(uid).child("data11").setValue(data11);
+        mDatabase.child("equipments").child(uid).child("data12").setValue(editText12.getText().toString().trim());
+        if (!add) {
+            mDatabase.child("equipments").child(uid).child("editedAt").setValue(g.getTimeInMillis());
+            mDatabase.child("equipments").child(uid).child("editedBy").setValue(user);
+        }
+        getActivity().sendBroadcast(new Intent(getActivity(), ReceiverSetAlarm.class));
         getDialog().cancel();
     }
 }

@@ -55,10 +55,10 @@ import java.util.Map;
 
 public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener, Dialog_context_menu.Dialog_context_menu_Listener, Dialog_delite_confirm.Dialog_delite_confirm_listiner, Dialog_data.Dialog_data_listiner, Dialod_opisanie_edit_reakt.listUpdateListiner, ExpandableListView.OnChildClickListener, Dialod_reakt_rasxod.updateJurnal, Dialog_context_menu_reakt.Dialog_context_menu_reakt_Listener {
 
-    private ArrayList<String> inventarny_spisok = new ArrayList<>();
+    private final ArrayList<String> inventarny_spisok = new ArrayList<>();
     private ArrayAdapter<String> arrayAdapter;
     private ListAdapterReakt arrayAdapter2;
-    public static ArrayList<ArrayList<String>> users = new ArrayList<>();
+    public static final ArrayList<ArrayList<String>> users = new ArrayList<>();
     private Dialod_opisanie_edit edit;
     private Dialod_opisanie_edit_reakt edit_reakt;
     private Dialod_reakt_rasxod rasxod;
@@ -67,11 +67,11 @@ public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItem
     private ProgressBar progressBar;
     private FirebaseAuth mAuth;
     public static ArrayList<InventorySpisok> InventorySpisok = new ArrayList<>();
-    public static LinkedHashMap<Integer, LinkedHashMap<Integer, LinkedHashMap<Integer, String>>> ReaktiveSpisok = new LinkedHashMap<>();
-    private ArrayList<ReaktiveSpisok> spisokGroup = new ArrayList<>();
+    public static final LinkedHashMap<Integer, LinkedHashMap<Integer, LinkedHashMap<Integer, String>>> ReaktiveSpisok = new LinkedHashMap<>();
+    private final ArrayList<ReaktiveSpisok> spisokGroup = new ArrayList<>();
     private TabHost tabHost;
     private ExpandableListView listView2;
-    private String[] ed_izmerenia = {"кг.", "мг.", "л.", "мл."};
+    private final String[] ed_izmerenia = {"кг.", "мг.", "л.", "мл."};
 
     @Override
     public void onDialogAddPartia(int groupPosition) {
@@ -785,7 +785,7 @@ public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItem
 
     private class ListAdapter extends ArrayAdapter<String> {
 
-        private SharedPreferences fuel;
+        private final SharedPreferences fuel;
 
         ListAdapter() {
             super(CremLabFuel.this, R.layout.simple_list_item, inventarny_spisok);
@@ -880,7 +880,7 @@ public class CremLabFuel extends AppCompatActivity implements AdapterView.OnItem
 
     private class ListAdapterReakt extends BaseExpandableListAdapter {
 
-        private SharedPreferences fuel;
+        private final SharedPreferences fuel;
 
         ListAdapterReakt() {
             fuel = getSharedPreferences("fuel", Context.MODE_PRIVATE);
